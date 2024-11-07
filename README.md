@@ -1,4 +1,4 @@
-# mynote
+# myNote
 
 ## 实用工具
 
@@ -25,3 +25,7 @@
 ## 11、Visual Studio Code配置相关
 
 ## 12、WebStorm配置相关
+
+## 13、webpack相关
+
+## 14、Vite相关
