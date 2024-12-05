@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Generator</title>
+    <style>
+    </style>
+</head>
+<body>
+<script type="text/javascript">
+    function promise1() {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve("promise1")
+            }, 1000)
+        })
+    }
+
+    function promise2(value) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(`promise2 => ${value}`)
+            }, 1000)
+        })
+    }
+
+    function* fn() {
+        const value = yield promise1()
+        console.log(`value : ${value}`)
+        const result = yield promise2(value)
+        console.log(`result : ${result}`)
+        return result
+    }
+
+    function asyncGenerator(generator) {
+        // 调用传入的生成器函数，返回生成器对象。期望返回一个Promise
+        const g = generator()
+        return new Promise((resolve) => {
+            // 执行 yield promise1()，将 promise1 作为 value 返回对象
+            const {value, done} = g.next()
+            // promise1 等待返回值进行相应操作
+            value.then((v) => {
+                // 将 promise1 的返回值作为参数执行 yield promise2()，将 promise2 作为 value 返回对象
+                const {value, done} = g.next(v)
+                // 将 promise2 作为返回参数
+                resolve(value)
+            })
+        })
+    }
+
+    // asyncGenerator(fn).then((res) => {
+    //     console.log(`res : ${res}`)
+    // })
+
+    // 控制台打印结果
+    // value : promise1
+    // res : promise2 => promise1
+
+    function asyncGenerator2(generator) {
+        return new Promise((resolve, reject) => {
+            const g = generator();
+
+            function next(param) {
+                const {done, value} = g.next(param);
+                if (!done) {
+                    // 未完成 继续递归
+                    Promise.resolve(value).then((res) => {
+                        next(res)
+                    });
+                } else {
+                    // 完成直接重置 Promise 状态
+                    resolve(value);
+                }
+            }
+
+            next();
+        });
+    }
+
+    asyncGenerator2(fn).then((res) => {
+        console.log(`res : ${res}`)
+    });
+
+    // 控制台打印结果
+    // value : promise1
+    // result : promise2 => promise1
+    // res : promise2 => promise1
+</script>
+</body>
+</html>
+
