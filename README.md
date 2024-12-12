@@ -1590,6 +1590,249 @@ asyncGenerator2(fn).then((res) => {
 
 ## 3、HTML5相关
 
+### 3.1 HTML5触摸事件
+
+参考：https://developer.mozilla.org/zh-CN/docs/Web/API/Element/touchstart_event
+https://www.cnblogs.com/wasbg/p/10951926.html
+https://juejin.cn/post/6844903695415525383
+
+#### 3.1.1 触摸事件基础
+
+触摸事件组成有如下四部分：
+
+* `touchstart`事件：在一个或多个触点与触控设备表面接触时被触发。
+* `touchmove`事件：在触点于触控平面上移动时触发。
+* `touchend`事件：在一个或多个触点从触控平面上移开时触发。注意，也有可能触发`touchcancel`事件。
+* `touchcancel`事件：在触点被中断时触发，中断方式基于特定实现而有所不同（例如，创建了太多的触点）。
+
+触摸事件都会冒泡，也可以取消。虽然触摸事件没有在`DOM`规范中定义，但是它们却是以兼容`DOM`的方式实现。触摸事件的`event`
+对象提供了鼠标事件中的常见属性：
+
+* `bubbles`：事件是否会沿`DOM`树向上冒泡
+* `cancelable`：是否可以用`preventDefault()`方法阻止默认事件
+* `clientX`：鼠标在视口内的水平坐标
+* `clientY`：鼠标在视口内的垂直坐标
+* `screenX`：鼠标在屏幕的水平坐标
+* `screenY`：鼠标在屏幕的垂直坐标
+
+除了常见的`DOM`属性，触摸事件还包含如下三个用于跟踪触摸的属性。
+
+* `touches`：`touch`对象数组。表示当前与表面接触的触点（不论事件目标或状态变化）。
+* `targetTouches`：`touch`对象数组。表示当前与触摸表面接触的触点，且触点起始于事件发生的目标元素。
+* `changeTouches`：`touch`对象数组。表示在前一个`touch`事件和当前的事件之间，状态发生变化的独立触点。
+
+`touch`对象属性
+
+* `identifier`：`touch`对象的唯一标识符
+* `screenX`：触点相对于屏幕上边缘的`X`坐标
+* `screenY`：触点相对于屏幕上边缘的`Y`坐标
+* `clientX`：触点相对于可见视区左边缘的`X`坐标。不包括任何滚动偏移。
+* `clientY`：触点相对于可见视区左边缘的`Y`坐标。不包括任何滚动偏移。
+* `pageX`：触点相对于`HTML`文档左边缘的`X`坐标。当存在水平滚动的偏移时，这个值包含了水平滚动的偏移。
+* `pageY`：触点相对于`HTML`文档左边缘的`Y`坐标。当存在水平滚动的偏移时，这个值包含了水平滚动的偏移。
+* `target`：返回触摸点最初接触的`Element` ，即使触摸点已经移出那个元素的交互区域。
+  **注意：如果这个元素在触摸过程中被移除，这个事件仍然会指向它，因此这个事件也不会冒泡到`window`或`document`对象。**
+
+#### 3.1.2 使用场景示例
+
+实现左滑带出删除按钮，监听长按事件并向上冒泡事件
+
+```vue
+
+<template>
+  <div>
+    <div ref="wrap" class="wrap" @touchstart="touchStart">
+      <div class="wrapDelete">{{"删除"}}</div>
+    </div>
+  </div>
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        longPress: null,
+        pressTime: 0,
+      };
+    },
+    methods: {
+      touchStart(event) {
+        clearTimeout(this.longPress);
+        this.pressTime = 0;
+        this.longPress = setTimeout(() => {
+          this.pressTime = 1000;
+        }, 1000);
+        const startPos = {
+          x: event.targetTouches[0]?.pageX ?? 0,
+          y: event.targetTouches[0]?.pageY ?? 0,
+        };
+        const move = (e) => {
+          const touches = e.targetTouches;
+          if (touches.length === 1) {
+            const movePos = {
+              x: e.targetTouches[0]?.pageX ?? 0,
+              y: e.targetTouches[0]?.pageY ?? 0,
+            };
+            const xDis = movePos.x - startPos.x;
+            if (Math.abs(xDis) > 50) {
+              if (xDis < 0) {
+                this.$refs.wrap.style.transform = "translate(-20%,0)";
+              } else {
+                this.$refs.wrap.style.transform = "translate(0,0)";
+              }
+            }
+          }
+        };
+        const stop = () => {
+          clearTimeout(this.longPress);
+          if (this.pressTime === 1000) {
+            // 长按事件向上冒泡事件
+            this.$emit("longPressEmits");
+          }
+          document.removeEventListener("touchmove", move);
+          document.removeEventListener("touchend", stop);
+        };
+        document.addEventListener("touchmove", move);
+        document.addEventListener("touchend", stop);
+      }
+    },
+  }
+</script>
+
+<style scoped lang="scss">
+  .wrap {
+    position: relative;
+
+    .sealDelete {
+      width: 15%;
+      position: absolute;
+      top: 15%;
+      right: -20%;
+      text-align: center;
+      color: #FFFFFF;
+      background-color: red;
+    }
+  }
+</style>
+```
+
+### 3.2 IntersectionObserver使用
+
+参考：https://developer.mozilla.org/zh-CN/docs/Web/API/IntersectionObserver/IntersectionObserver
+https://www.ruanyifeng.com/blog/2016/11/intersectionobserver_api.html
+https://juejin.cn/post/6844903874302574599
+
+#### 3.2.1 IntersectionObserver基础
+
+`IntersectionObserver`接口（从属于`Intersection Observer API`）提供了一种**异步**
+观察目标元素与其祖先元素或顶级文档视口（`viewport`）交叉状态的方法。其祖先元素或视口被称为根（`root`）。
+
+当一个`IntersectionObserver`对象被创建时，其被配置为监听根中一段给定比例的可见区域。一旦`IntersectionObserver`
+被创建，则无法更改其配置，所以一个给定的观察者对象只能用来监听可见区域的特定变化值；然而，你可以在同一个观察者对象中配置监听多个目标元素。
+
+**语法**
+
+```javascript
+const observer = new IntersectionObserver(callback, options);
+```
+
+**参数**
+
+`callback`：当元素可见比例超过指定阈值后，会调用一个回调函数，此回调函数接受两个参数：
+
+* `entries`：一个`IntersectionObserverEntry`对象的数组，每个被触发的阈值，都或多或少与指定阈值有偏差。
+* `observer`：被调用的`IntersectionObserver`实例。
+
+`options`（可选项）：一个可以用来配置`observer`实例的对象。如果`options`未指定，`observer`实例默认使用文档视口作为`root`
+，并且没有`margin`，阈值为0%（即一像素的改变都会触发回调函数）。你可以指定以下配置：
+
+* `root`：监听元素的祖先元素`Element`
+  对象，其边界盒将被视作视口。目标在根的可见区域的任何不可见部分都会被视为不可见。如果构造函数未传入`root`或其值为`null`
+  ，则默认使用顶级文档的视口。
+* `rootMargin`：在计算与根节点交叉值的一组偏移量，可以缩小/扩大判定范围从而满足计算需要。语法大致和`CSS`中的`margin`
+  属性等同;默认值是`0px 0px 0px 0px`。
+* `threshold`：规定的监听目标与边界盒交叉区域的比例值，可以是具体数值或是`0`到`1`之间的数组。若指定值为`0`
+  则监听元素即使与根有`1`像素交叉，也被视为可见。若指定值为`1`，则整个元素都在可见范围内时才算可见。阈值的默认值为`0`。
+
+**返回值**
+
+可以使用阈值监听目标元素可见部分与`root`交叉状况的新的`IntersectionObserver`实例。调用自身的observe() 方法开始使用规定的阈值监听指定目标。
+
+**实例方法**
+
+```javascript
+IntersectionObserver.disconnect()
+// 使 IntersectionObserver 对象停止监听目标。
+IntersectionObserver.observe()
+// 使 IntersectionObserver 开始监听一个目标元素。
+IntersectionObserver.takeRecords()
+// 返回所有观察目标的 IntersectionObserverEntry 对象数组。
+IntersectionObserver.unobserve()
+// 使 IntersectionObserver 停止监听特定目标元素。
+```
+
+#### 3.2.2 IntersectionObserverEntry对象
+
+`IntersectionObserverEntry`描述了目标元素与根元素容器在某一特定过渡时刻的交叉状态。其实例对象作为`entries`
+参数被传递到一个`IntersectionObserver`的回调函数中;这些对象只能通过调用`IntersectionObserver.takeRecords()`来获取。
+
+**属性**
+
+* `boundingClientRect`：返回一个`DOMRectReadOnly`用来描述包含目标元素的边界信息，
+  计算方式与`Element.getBoundingClientRect()`相同。
+* `intersectionRatio`：返回`intersectionRect`与`boundingClientRect`的比例值。
+* `intersectionRect`：返回一个`DOMRectReadOnly`用来描述根和目标元素的相交区域。
+* `isIntersecting`：如果目标元素与交叉区域观察者对象的根相交，返回`true`，否则返回`false`。
+* `isVisible`：实验性属性，暂时不与记录
+* `rootBounds`：返回一个`DOMRectReadOnly`用来描述根元素的边界信息。
+* `target`：与根出现相交区域改变的元素
+* `time`：可见性发生变化的时间，是一个高精度时间戳，单位为毫秒
+
+![3.2.1.png](assets/3.2/1.png)
+
+上图中，灰色的水平方框代表视口，深红色的区域代表四个被观察的目标元素。它们各自的`intersectionRatio`图中都已经注明。
+
+#### 3.2.3 使用场景示例
+
+##### 3.2.3.1 惰性加载（lazy load）
+
+有时，我们希望某些静态资源（比如图片），只有用户向下滚动，它们进入视口时才加载，这样可以节省带宽，提高网页性能。这就叫做“惰性加载”。
+
+```javascript
+// 图片懒加载
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      entry.target.src = entry.target.dataset.src
+      // 图片加载后，停止监听元素
+      observer.unobserve(entry.target)
+    }
+  });
+}, {
+  root: document.querySelector(".root")
+});
+
+Array.from(document.querySelectorAll("img")).forEach((img) => {
+  observer.observe(img);
+});
+```
+
+##### 3.2.3.2 无限滚动
+
+无限滚动时，在页面底部添加页尾栏（又称边界哨兵）。页尾栏可见表示用户到达了页面底部，从而加载新的条目放在页尾栏前面。这样做的好处是，不需要再一次调用`observe()`
+方法，现有的`IntersectionObserver`可以保持使用。
+
+```javascript
+// 无限滚动
+const observer = new IntersectionObserver((entries) => {
+  if (entries[0].intersectionRatio > 0) {
+    loadItem(10)
+    console.log("load new item")
+  }
+});
+
+observer.observe(document.querySelector(".scrollerFooter"));
+```
 ## 4、VUE2相关
 
 ## 5、VUE3相关
