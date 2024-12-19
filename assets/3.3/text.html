@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Text</title>
+    <style>
+    </style>
+</head>
+<body>
+<canvas id="canvas" width="400" height="200" class="playable-canvas"></canvas>
+<div class="playable-buttons">
+    <input id="edit" type="button" value="Edit"/>
+    <input id="reset" type="button" value="Reset"/>
+</div>
+<label for="code"></label>
+<textarea id="code" rows="5" cols="40">
+ctx.font = "48px serif";
+ctx.textBaseline = "hanging";
+ctx.strokeText("Hello world", 0, 100);
+</textarea>
+
+
+<script type="text/javascript">
+    // 获取元素
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const textarea = document.getElementById("code");
+    const reset = document.getElementById("reset");
+    const edit = document.getElementById("edit");
+    const code = textarea.value;
+    // 设置字体默认样式
+    ctx.font = "48px serif";
+    ctx.textBaseline = "alphabetic";
+    ctx.strokeText("Hello world", 0, 100);
+
+    // 渲染文字
+    function drawCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        eval(textarea.value);
+    }
+
+    // 重置文字样式
+    reset.addEventListener("click", function () {
+        textarea.value = code;
+        drawCanvas();
+    });
+    // 编辑文字样式
+    edit.addEventListener("click", function () {
+        textarea.focus();
+    });
+    // 监听文本域输入事件
+    textarea.addEventListener("input", drawCanvas);
+    window.addEventListener("load", drawCanvas);
+</script>
+</body>
+</html>
+

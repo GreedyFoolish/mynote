@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8"/>
+    <title>drawImage</title>
+    <style>
+    </style>
+</head>
+<body onload="draw();">
+<canvas id="canvas" width="180" height="150"></canvas>
+
+<script type="text/javascript">
+    function draw() {
+        const ctx = document.getElementById("canvas").getContext("2d");
+        const img = new Image();
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0);
+            ctx.beginPath();
+            ctx.moveTo(30, 96);
+            ctx.lineTo(70, 66);
+            ctx.lineTo(103, 76);
+            ctx.lineTo(170, 15);
+            ctx.stroke();
+        };
+        img.src = "./1.png";
+    }
+</script>
+</body>
+</html>
+

@@ -2902,6 +2902,358 @@ function draw() {
 
 ![3.3.27.png](assets/3.3/27.png)
 
+#### 3.3.4 绘制文本
+
+##### 3.3.4.1 绘制文本
+
+canvas 提供了两种方法来渲染文本：
+
+```javascript
+fillText(text, x, y, maxWidth)
+// 在指定的 (x,y) 位置填充指定的文本，绘制的最大宽度是可选的。
+strokeText(text, x, y, maxWidth)
+// 在指定的 (x,y) 位置绘制文本边框，绘制的最大宽度是可选的。
+```
+
+**填充文本示例**
+
+```javascript
+function draw() {
+  const ctx = document.getElementById("canvas").getContext("2d");
+  ctx.font = "48px serif";
+  ctx.fillText("Hello world", 10, 50);
+}
+```
+
+![3.3.28.png](assets/3.3/28.png)
+
+**文本边框示例**
+
+```javascript
+function draw() {
+  const ctx = document.getElementById("canvas").getContext("2d");
+  ctx.font = "48px serif";
+  ctx.strokeText("Hello world", 10, 50);
+}
+```
+
+![3.3.29.png](assets/3.3/29.png)
+
+##### 3.3.4.2 有样式的文本
+
+```javascript
+font = value
+// 当前我们用来绘制文本的样式。这个字符串使用和 CSS font 属性相同的语法。默认的字体是 10px sans-serif。
+textAlign = value
+// 文本对齐选项。可选的值包括：start, end, left, right or center. 默认值是 start。
+textBaseline = value
+// 基线对齐选项。可选的值包括：top, hanging, middle, alphabetic, ideographic, bottom。默认值是 alphabetic。
+direction = value
+// 文本方向。可能的值包括：ltr, rtl, inherit。默认值是 inherit。
+```
+
+下图展示了`textBaseline`属性支持的不同基线的情况：
+
+![3.3.30.png](assets/3.3/30.png)
+
+**`textBaseline`示例**
+
+```javascript
+// 仅包含javascript代码，详见text.html文件
+ctx.font = "48px serif";
+ctx.textBaseline = "hanging";
+ctx.strokeText("Hello world", 0, 100);
+```
+
+![3.3.31.png](assets/3.3/31.png)
+
+##### 3.3.4.3 预测量文本宽度
+
+```javascript
+measureText()
+// 将返回一个 TextMetrics 对象的宽度、所在像素，这些体现文本特性的属性。
+```
+
+**`measureText`示例**
+
+```javascript
+function draw() {
+  const ctx = document.getElementById("canvas").getContext("2d");
+  const text = ctx.measureText("foo");
+  // 测量 foo 的文本宽度
+  text.width;
+  // 15.259994506835938
+}
+```
+
+##### 3.3.4.4 Geoko 特性说明
+
+在`Geoko`（`Firefox`，`Firefox OS`及基于`Mozilla`的应用的渲染引擎）中，曾有一些版本较早的`API`实现了在`canvas`
+上对文本作画的功能，但它们现在已不再使用。
+
+#### 3.3.5 使用图像
+
+`canvas`更有意思的一项特性就是图像操作能力。可以用于动态的图像合成、图形的背景以及游戏界面（`Sprites`
+）等。浏览器支持的任意格式的外部图片都可以使用（`PNG`、`GIF`或`JPEG`）。甚至可以将同一个页面中其他`canvas`生成的图片作为图片源。
+
+引入图像到`canvas`里需要以下两个基本操作：
+
+1、获取一个`HTMLImageElement`对象或一个`canvas`对象作为图片源，也可以通过提供一个`URL`的方式来使用图片。
+2、使用`drawImage()`函数将图片绘制到画布上
+
+##### 3.3.5.1 获得需要绘制的图片
+
+`canvas`的`API`可以使用以下类型中的一种作为图片源：
+
+```javascript
+HTMLImageElement
+// 这些图片是由 Image() 函数构造出来的，或是 <img> 元素
+HTMLVideoElement
+// 用一个 HTML 的 <video> 元素作为你的图片源，可以从视频中抓取当前帧作为一个图像
+HTMLCanvasElement
+// 可以使用另一个 <canvas> 元素作为你的图片源。
+ImageBitmap
+// 这是一个高性能的位图，可以低延迟地绘制，它可以从上述的所有源以及其他几种源中生成。
+```
+
+**这些源统一由`CanvasImageSource`类型来引用。**
+
+**使用相同页面内的图片**
+
+* `document.images`集合
+* `document.getElementsByTagName()`方法
+* 如果你知道使用的图片`ID`，你可以用`document.getElementById()`获得这个图片
+
+**使用其他域名下的图片**
+
+在`HTMLImageElement`上使用`crossOrigin`属性，你可以请求加载其他域名上的图片。如果图片的服务器允许跨域访问这个图片，那么你可以使用这个图片而不污染
+`canvas`，否则，使用这个图片将会污染`canvas`。
+
+**使用其他`canvas`元素**
+
+和使用相同页面内的图片类似，用`document.getElementsByTagName`或`document.getElementById`方法来获取其他`canvas`
+元素。但你引入的应该是已经准备好的`canvas`。
+
+一个常见的应用就是将第二个`canvas`作为另一个大的`canvas`的缩略图。
+
+**由零开始创建图像**
+
+使用脚本创建一个新的`HTMLImageElement`对象。可以使用`Image()`构造函数来实现。
+
+```javascript
+const img = new Image();
+// 创建一个 img 元素
+img.src = "myImage.png";
+// 设置图片源地址
+```
+
+当脚本执行后，图片开始装载。
+
+若调用`drawImage`时，图片还没加载完，那么就不会有效果（一些旧的浏览器中可能会抛出异常）。因此需要用`load`事件确保使用的图片加载完成：
+
+```javascript
+const img = new Image();
+// 创建一个 img 元素
+img.onload = function () {
+  // 执行 drawImage 语句
+};
+img.src = "myImage.png";
+// 设置图片源地址
+```
+
+**通过`data:url`方式嵌入图像**
+
+我们还可以通过`data:url`方式来引用图像。`Data urls`允许用一串`Base64`编码的字符串的方式来定义一个图片。
+
+```javascript
+img.src = "data:image/gif;base64,R0lGODlhCwALAIAAAAAA3pn/ZiH5BAEAAAEALAAAAAALAAsAAAIUhA+hkcuO4lmNVindo7qyrIXiGBYAOw==";
+```
+
+优点：
+
+* 图片即时可用，不需要请求服务器。
+* 可以将`CSS`，`JavaScript`，`HTML`和图片全部封装在一起，迁移起来十分方便
+
+缺点：
+
+* 图像没法缓存，图片大的话内嵌的`url`数据会非常长：
+
+**使用视频帧**
+
+你还可以使用`<video>`中的视频帧（即便视频是不可见的）。例如，如果你有一个`ID`为`myvideo`的`<video>`元素，你可以这样做：
+
+```javascript
+function getMyVideo() {
+  const canvas = document.getElementById("canvas");
+  if (canvas.getContext) {
+    const ctx = canvas.getContext("2d");
+    return document.getElementById("myvideo");
+  }
+}
+```
+
+##### 3.3.5.2 绘制图片
+
+一旦获得了图片源对象，我们就可以使用`drawImage`方法将它渲染到`canvas`里。`drawImage`方法有三种形态，下面是最基础的一种。
+
+```javascript
+drawImage(image, x, y)
+// 其中 image 是 image 或者 canvas 对象，x 和 y 是其在目标 canvas 里的起始坐标。
+// 备注：SVG 图像必须在 <svg> 根指定元素的宽度和高度。
+```
+
+**`drawImage`线图示例**
+
+```javascript
+// 仅包含javascript代码，详见drawImage.html文件
+function draw() {
+  const ctx = document.getElementById("canvas").getContext("2d");
+  const img = new Image();
+  img.onload = function () {
+    ctx.drawImage(img, 0, 0);
+    ctx.beginPath();
+    ctx.moveTo(30, 96);
+    ctx.lineTo(70, 66);
+    ctx.lineTo(103, 76);
+    ctx.lineTo(170, 15);
+    ctx.stroke();
+  };
+  img.src = "./1.png";
+}
+```
+
+##### 3.3.5.3 缩放
+
+`drawImage`方法的一种重载用法，增加了两个用于控制图像在`canvas`中缩放的参数。
+
+```javascript
+drawImage(image, x, y, width, height)
+// 这个用法多了 2 个参数：width 和 height，这两个参数用来控制 当向 canvas 画入时应该缩放的大小
+```
+
+**`drawImage`平铺图像示例**
+
+此例中，将一张图片作为背景在`canvas`中重复平铺。通过循环铺开经过缩放的图片。图像大小被缩放至原来的六分之一`50x38px`。
+
+**备注： 图像可能会因为大幅度的缩放而变得模糊。如果图像里面有文字，最好还是不要进行缩放，因为文字缩放后很可能就无法辨认了。**
+
+```javascript
+function draw() {
+  const ctx = document.getElementById("canvas").getContext("2d");
+  const img = new Image();
+  img.onload = () => {
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 3; j++) {
+        ctx.drawImage(img, j * 50, i * 38, 50, 38);
+      }
+    }
+  };
+  img.src = "https://mdn.github.io/shared-assets/images/examples/rhino.jpg";
+}
+
+draw();
+```
+
+![3.3.32.png](assets/3.3/32.png)
+
+##### 3.3.5.4 切片
+
+`drawImage`方法的另外一种重载用法，有`8`个用于控制做切片显示的新参数。
+
+```javascript
+drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+// 第一个参数，image 是 image 或者 canvas 对象。
+// 新的 8 个参数参考下图图解，前 4 个是定义图片源的切片位置和大小，后 4 个则是定义切片的目标显示位置和大小。
+```
+
+![3.3.33.png](assets/3.3/33.png)
+
+切片是个做图像合成的强大工具。假设有一张包含了所有元素的图像，那么你可以用这个方法来合成一个完整图像。例如，你想画一张图表，而手上有一个包含所有必需的文字的
+`PNG`文件，那么你可以根据实际数据的需要来改变最终显示的图表。**这方法的另一个好处就是你不需要单独装载每一个图像。**
+
+**`drawImage`相框示例**
+
+```javascript
+// 仅包含javascript代码，详见drawImage-album.html文件
+async function draw() {
+  // 等待所有图片的加载。
+  await Promise.all(Array.from(document.images).map((image) => new Promise((resolve) => image.addEventListener("load", resolve))));
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+  // 绘制切片
+  ctx.drawImage(document.getElementById("source"), 33, 71, 104, 124, 21, 20, 87, 104,);
+  // 绘制相框
+  ctx.drawImage(document.getElementById("frame"), 0, 0);
+}
+
+draw();
+```
+
+![3.3.34.png](assets/3.3/34.png)
+
+##### 3.3.5.5 画廊示例
+
+当页面及图片加载好后，为每张**画**创建`canvas`对象，加上相框，然后绘制到画廊中去。
+
+此例中，所有**画**和相框都是固定宽高的。
+
+使用`insertBefore`方法，将新节点（`canvas`元素）插入到指定节点之前。
+
+**`drawImage`画廊示例**
+
+```javascript
+// 仅包含javascript代码，详见drawImage-gallery.html文件
+const imgSrc = [
+  "https://8deb4ee3957797b28d0e0ed0c7f2c8425fd9e13f.mdnplay.dev/en-US/docs/Web/API/Canvas_API/Tutorial/Using_images/gallery_1.jpg",
+  "https://8deb4ee3957797b28d0e0ed0c7f2c8425fd9e13f.mdnplay.dev/en-US/docs/Web/API/Canvas_API/Tutorial/Using_images/gallery_2.jpg",
+  "https://8deb4ee3957797b28d0e0ed0c7f2c8425fd9e13f.mdnplay.dev/en-US/docs/Web/API/Canvas_API/Tutorial/Using_images/gallery_3.jpg",
+  "https://8deb4ee3957797b28d0e0ed0c7f2c8425fd9e13f.mdnplay.dev/en-US/docs/Web/API/Canvas_API/Tutorial/Using_images/gallery_4.jpg",
+  "https://8deb4ee3957797b28d0e0ed0c7f2c8425fd9e13f.mdnplay.dev/en-US/docs/Web/API/Canvas_API/Tutorial/Using_images/gallery_5.jpg",
+  "https://8deb4ee3957797b28d0e0ed0c7f2c8425fd9e13f.mdnplay.dev/en-US/docs/Web/API/Canvas_API/Tutorial/Using_images/gallery_6.jpg",
+  "https://8deb4ee3957797b28d0e0ed0c7f2c8425fd9e13f.mdnplay.dev/en-US/docs/Web/API/Canvas_API/Tutorial/Using_images/gallery_7.jpg",
+  "https://8deb4ee3957797b28d0e0ed0c7f2c8425fd9e13f.mdnplay.dev/en-US/docs/Web/API/Canvas_API/Tutorial/Using_images/gallery_8.jpg",
+]
+
+async function draw() {
+  const imgList = document.querySelectorAll(".img")
+  for (let i = 0; i < imgList.length; i++) {
+    imgList[i].src = imgSrc[i];
+  }
+  // 等待所有图片的加载。
+  await Promise.all(Array.from(document.images).map((image) => new Promise((resolve) => image.addEventListener("load", resolve))));
+  // 循环所有的图片对象
+  for (let i = 0; i < imgList.length; i++) {
+    // 创建 canvas 元素
+    const canvas = document.createElement("canvas");
+    canvas.setAttribute("width", "132");
+    canvas.setAttribute("height", "150");
+    // 在图像前插入
+    imgList[i].parentNode.insertBefore(canvas, imgList[i]);
+    const ctx = canvas.getContext("2d");
+    // 将图像绘制到画布
+    ctx.drawImage(imgList[i], 15, 20);
+    // 添加相框
+    ctx.drawImage(document.getElementById("frame"), 0, 0);
+  }
+}
+
+draw();
+```
+
+![3.3.5.png](assets/3.3/35.png)
+
+##### 3.3.5.6 控制图像的缩放行为
+
+如同前文所述，过度缩放图像可能会导致图像模糊或像素化。可以通过使用绘图环境的`imageSmoothingEnabled`
+属性来控制是否在缩放图像时使用平滑算法。默认为`true`，即启用平滑缩放。你也可以禁用此功能：
+
+```javascript
+ctx.mozImageSmoothingEnabled = false;
+ctx.webkitImageSmoothingEnabled = false;
+ctx.msImageSmoothingEnabled = false;
+ctx.imageSmoothingEnabled = false;
+```
+
 ## 4、VUE2相关
 
 ## 5、VUE3相关
