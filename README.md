@@ -3254,6 +3254,353 @@ ctx.msImageSmoothingEnabled = false;
 ctx.imageSmoothingEnabled = false;
 ```
 
+#### 3.3.6 变形（Transformations）
+
+##### 3.3.6.1 状态的保存和恢复
+
+在了解变形之前，先介绍两个在你开始绘制复杂图形时必不可少的方法。
+
+```javascript
+save()
+// 保存画布 Canvas 的所有状态
+restore()
+// save 和 restore 方法是用来保存和恢复 Canvas 状态的，都没有参数。Canvas 的状态就是当前画面应用的所有样式和变形的一个快照。
+```
+
+`Canvas`状态存储在栈中，每当`save()`方法被调用后，当前的状态就被推送到栈中保存。一个绘画状态包括：
+
+* 当前应用的变形（即移动，旋转和缩放）
+* `Canvas`属性：`strokeStyle`，`fillStyle`，`globalAlpha`，`lineWidth`，`lineCap`，`lineJoin`，`miterLimit`，`lineDashOffset`,
+  `shadowOffsetX`，`shadowOffsetY`，`shadowBlur`，`shadowColor`，`globalCompositeOperation`，`font`，`textAlign`，`textBaseline`,`direction`，`imageSmoothingEnabled`
+* 当前的裁切路径（`clipping path`）
+
+`save`方法可以调用任意次数。每一次调用`restore`方法，上一个保存的状态就从栈中弹出，所有设定都恢复。
+
+**`save`和`restore`示例**
+
+调用`restore`方法，状态栈中的最后状态会弹出并恢复所有设置。如果没有用`save`保存状态，那就需要手动改变设置来回到前一个状态。
+
+**注意：调用`restore`方法，并且状态栈中没有保存的状态，再次绘制图像则会使用最后一次弹出的状态（没有手动改变设置的情况下）。**
+
+```javascript
+function draw() {
+  const ctx = document.getElementById("canvas").getContext("2d");
+  ctx.fillRect(0, 0, 150, 150); // 使用默认设置绘制一个矩形
+  ctx.save(); // 保存默认状态
+  ctx.fillStyle = "#09F"; // 在原有配置基础上对颜色做改变
+  ctx.fillRect(15, 15, 120, 120); // 使用新的设置绘制一个矩形
+  ctx.save(); // 保存当前状态
+  ctx.fillStyle = "#FFF"; // 再次改变颜色配置
+  ctx.globalAlpha = 0.5;
+  ctx.fillRect(30, 30, 90, 90); // 使用新的配置绘制一个矩形
+  ctx.restore(); // 重新加载之前的颜色状态
+  ctx.fillRect(45, 45, 60, 60); // 使用上一次的配置绘制一个矩形
+  ctx.restore(); // 加载默认颜色配置
+  ctx.fillRect(60, 60, 30, 30); // 使用加载的配置绘制一个矩形
+}
+```
+
+![3.3.36.png](assets/3.3/36.png)
+
+##### 3.3.6.2 移动
+
+`translate`方法，它用于以原点为基准将`canvas`移动到一个新位置。
+
+```javascript
+translate(x, y)
+// translate 方法接受两个参数。 x 是左右偏移量，y 是上下偏移量，如下图所示。
+```
+
+![3.3.37.png](assets/3.3/37.png)
+
+大多数情况下，调用`restore`方法比手动恢复原先的状态要简单得多。如果在循环中做位移但没有保存和恢复`canvas`
+的状态，很可能会出现某些`canvas`元素没有渲染的情况，因为它很可能已经超出`canvas`范围以外了。
+
+**`translate`示例**
+
+```javascript
+function draw() {
+  const ctx = document.getElementById("canvas").getContext("2d");
+  for (const i = 0; i < 3; i++) {
+    for (const j = 0; j < 3; j++) {
+      ctx.save();
+      ctx.fillStyle = "rgb(" + 51 * i + ", " + (255 - 51 * i) + ", 255)";
+      ctx.translate(10 + j * 50, 10 + i * 50);
+      ctx.fillRect(0, 0, 25, 25);
+      ctx.restore();
+    }
+  }
+}
+```
+
+![3.3.38.png](assets/3.3/38.png)
+
+##### 3.3.6.3 旋转
+
+`rotate`方法，它用于以原点为中心旋转`canvas`。
+
+```javascript
+rotate(angle)
+// rotate 方法接受一个参数：旋转的角度 angle，它是顺时针方向的，以弧度为单位的值。
+```
+
+![3.3.39.png](assets/3.3/39.png)
+
+**注意：旋转的中心点始终是`canvas`的原点。如果要改变它，我们需要用到`translate`方法。**
+
+**`rotate`示例**
+
+```javascript
+function draw() {
+  const ctx = document.getElementById("canvas").getContext("2d");
+  ctx.save();
+  // 左矩形，从画布原点旋转
+  // 绘制蓝色矩形
+  ctx.fillStyle = "#0095DD";
+  ctx.fillRect(30, 30, 100, 100);
+  ctx.rotate((Math.PI / 180) * 25); // 旋转
+  // 绘制灰色矩形
+  ctx.fillStyle = "#4D4E53";
+  ctx.fillRect(30, 30, 100, 100);
+  ctx.restore();
+  // 右矩形，从矩形中心旋转
+  // 绘制蓝色矩形
+  ctx.fillStyle = "#0095DD";
+  ctx.fillRect(150, 30, 100, 100);
+  ctx.translate(200, 80); // 移动到矩形中心
+  // translateX = x + 0.5 * width
+  // translateY = y + 0.5 * height
+  ctx.rotate((Math.PI / 180) * 25); // 旋转
+  ctx.translate(-200, -80); // 重置移动操作
+  // 绘制灰色矩形
+  ctx.fillStyle = "#4D4E53";
+  ctx.fillRect(150, 30, 100, 100);
+}
+```
+
+![3.3.40.png](assets/3.3/40.png)
+
+##### 3.3.6.4 缩放
+
+`scale`方法，它用于增减图形在`canvas`中的像素数目，对形状，位图进行缩小或者放大。
+
+```javascript
+scale(x, y)
+// scale 方法可以缩放画布的水平和垂直的单位。两个参数都是实数，可为负数，x 为水平缩放因子，y 为垂直缩放因子。
+// 如果比 1 小，会缩小图形，如果比 1 大会放大图形。默认值为 1，为实际大小。
+```
+
+画布初始情况下，是以左上角坐标为原点的第一象限。如果参数为负实数，相当于以`x`或`y`
+轴作为对称轴镜像反转（例如，使用`translate(0,canvas.height)`;`scale(1,-1)`; 以`y`轴作为对称轴镜像反转，就可得到著名的笛卡尔坐标系，左下角为原点）。
+
+默认情况下，`canvas`的`1`个单位为`1`个像素。举例说，如果我们设置缩放因子是`0.5`，`1`个单位就变成对应`0.5`
+个像素，这样绘制出来的形状就会是原先的一半。同理，设置为`2.0`时，`1`个单位就对应变成了`2`像素，绘制的结果就是图形放大了`2`倍。
+
+**`scale`示例**
+
+```javascript
+function draw() {
+  const ctx = document.getElementById("canvas").getContext("2d");
+  // draw a simple rectangle, but scale it.
+  ctx.save();
+  ctx.scale(10, 3);
+  ctx.fillRect(1, 10, 10, 10);
+  ctx.restore();
+  // mirror horizontally
+  ctx.scale(-1, 1);
+  ctx.font = "48px serif";
+  ctx.fillText("MDN", -135, 120);
+}
+```
+
+![3.3.41.png](assets/3.3/41.png)
+
+##### 3.3.6.5 变形
+
+`transform`方法，它可以直接对`canvas`变形矩阵进行修改。
+
+```javascript
+transform(a, b, c, d, e, f)
+// 这个方法是将当前的变形矩阵乘上一个基于自身参数的矩阵，矩阵形式：[[a, c, e], [b, d, f], [0, 0, 1]]
+```
+
+如果任意一个参数是`Infinity`（全局属性，表示一个无穷大的数值），变形矩阵也必须被标记为无限大，否则会抛出异常。
+
+矩阵中，各个参数含义：
+
+* `a`（`m11`）：水平方向的缩放
+* `b`（`m12`）：竖直方向的倾斜偏移
+* `c`（`m21`）：水平方向的倾斜偏移
+* `d`（`m22`）：竖直方向的缩放
+* `e`（`dx`）：水平方向的移动
+* `f`（`dy`）：竖直方向的移动
+
+```javascript
+setTransform(a, b, c, d, e, f)
+// 这个方法会将当前的变形矩阵重置为单位矩阵，然后用相同的参数调用 transform 方法。
+// 如果任意一个参数是无限大，那么变形矩阵也必须被标记为无限大，否则会抛出异常。
+// 从本质上来说，该方法是取消了当前变形，然后设置为指定的变形，一步完成。
+resetTransform()
+// 重置当前变形为单位矩阵，它和调用以下语句是一样的：ctx.setTransform(1, 0, 0, 1, 0, 0);
+```
+
+**`transform`和`setTransform`示例**
+
+```javascript
+function draw() {
+  const ctx = document.getElementById("canvas").getContext("2d");
+  const sin = Math.sin(Math.PI / 6);
+  const cos = Math.cos(Math.PI / 6);
+  ctx.translate(100, 100);
+  const c = 0;
+  for (let i = 0; i <= 12; i++) {
+    c = Math.floor((255 / 12) * i);
+    ctx.fillStyle = "rgb(" + c + "," + c + "," + c + ")";
+    ctx.fillRect(0, 0, 100, 10);
+    ctx.transform(cos, sin, -sin, cos, 0, 0);
+  }
+  // 重置变形
+  ctx.setTransform(-1, 0, 0, 1, 100, 100);
+  ctx.fillStyle = "rgba(255, 128, 255, 0.5)";
+  ctx.fillRect(0, 50, 100, 100);
+}
+```
+
+![3.3.42.png](assets/3.3/42.png)
+
+#### 3.3.7 合成（Compositing）
+
+##### 3.3.7.1 全局合成操作
+
+参考：https://developer.mozilla.org/zh-CN/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
+
+`globalCompositeOperation`属性设置在绘制新形状时应用的合成操作策略。
+
+```javascript
+globalCompositeOperation = type
+// 这个属性设置在绘制新形状时应用的合成操作策略，有很多种策略。
+```
+
+**合成操作策略**
+
+* `source-over`（默认值）：在现有画布上绘制新图形。
+* `source-in`：仅在新形状和目标画布重叠的地方绘制新形状。其他的都是透明的。
+* `source-out`：在不与现有画布内容重叠的地方绘制新图形。
+* `source-atop`：仅在与现有画布内容重叠的地方绘制新图形。
+* `destination-over`：在现有画布内容的后面绘制新的图形。
+* `destination-in`：仅保留现有画布内容和新形状重叠的部分。其他的都是透明的。
+* `destination-out`：仅保留现有画布内容和新形状不重叠的部分。
+* `destination-atop`：仅保留现有画布内容和新形状重叠的部分。新形状是在现有画布内容的后面绘制的。
+* `lighter`：两个重叠图形的颜色是通过颜色值相加来确定的。
+* `copy`：仅显示新图形。
+* `xor`：形状在重叠处变为透明，并在其他地方正常绘制。
+* `multiply`：将顶层像素与底层相应像素相乘，结果是一幅更黑暗的图片。
+* `screen`：像素被倒转、相乘、再倒转，结果是一幅更明亮的图片（与`multiply`相反）。
+* `overlay`：`multiply`和`screen`的结合。原本暗的地方更暗，原本亮的地方更亮。
+* `darken`：保留两个图层中最暗的像素。
+* `lighten`：保留两个图层中最亮的像素。
+* `color-dodge`：将底层除以顶层的反置。
+* `color-burn`：将反置的底层除以顶层，然后将结果反过来。
+* `hard-light`：类似于`overlay`，`multiply`和`screen`的结合，但上下图层互换了。
+* `soft-light`：柔和版本的`hard-light`。纯黑或纯白不会导致纯黑或纯白。
+* `difference`：从顶层减去底层（或反之亦然），始终得到正值。
+* `exclusion`：与`difference`类似，但对比度较低。
+* `hue`：保留底层的亮度（`luma`）和色度（`chroma`），同时采用顶层的色调（`hue`）。
+* `saturation`：保留底层的亮度和色调，同时采用顶层的色度。
+* `color`：保留了底层的亮度，同时采用了顶层的色调和色度。
+* `luminosity`：保持底层的色调和色度，同时采用顶层的亮度。
+
+**`globalCompositeOperation`示例**
+
+```javascript
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+ctx.globalCompositeOperation = "xor";
+ctx.fillStyle = "blue";
+ctx.fillRect(10, 10, 100, 100);
+ctx.fillStyle = "red";
+ctx.fillRect(50, 50, 100, 100);
+```
+
+![3.3.43.png](assets/3.3/43.png)
+
+##### 3.3.7.2 裁切路径
+
+裁切路径和普通的`canvas`图形差不多，不同的是它的作用是遮罩，用来隐藏不需要的部分。如下图所示，红边五角星就是裁切路径，所有路径外的部分都不会绘制出来。
+
+![3.3.44.png](assets/3.3/44.png)
+
+裁切路径可以实现与`globalCompositeOperation`属性`source-in`和`source-atop`类似的效果。
+**最重要的区别是裁切路径不会在`canvas`上绘制东西，而且它永远不受新图形的影响。**
+
+**`clip`示例**
+
+```javascript
+// 用一个圆形的裁切路径来限制随机星星的绘制区域。
+function draw() {
+  const ctx = document.getElementById("canvas").getContext("2d");
+  ctx.fillRect(0, 0, 150, 150);
+  ctx.translate(75, 75);
+  // 创建一个圆形的裁切路径
+  ctx.beginPath();
+  ctx.arc(0, 0, 60, 0, Math.PI * 2, true);
+  ctx.clip();
+  // 绘制线性渐变的星空背景
+  const lingrad = ctx.createLinearGradient(0, -75, 0, 75);
+  lingrad.addColorStop(0, "#232256");
+  lingrad.addColorStop(1, "#143778");
+  ctx.fillStyle = lingrad;
+  ctx.fillRect(-75, -75, 150, 150);
+  // 绘制星星
+  for (let j = 1; j < 50; j++) {
+    ctx.save();
+    ctx.fillStyle = "#fff";
+    ctx.translate(
+            75 - Math.floor(Math.random() * 150),
+            75 - Math.floor(Math.random() * 150),
+    );
+    drawStar(ctx, Math.floor(Math.random() * 4) + 2);
+    ctx.restore();
+  }
+}
+
+// 绘制星星
+function drawStar(ctx, r) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(r, 0);
+  for (let i = 0; i < 9; i++) {
+    ctx.rotate(Math.PI / 5);
+    if (i % 2 == 0) {
+      ctx.lineTo((r / 0.525731) * 0.200811, 0);
+    } else {
+      ctx.lineTo(r, 0);
+    }
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+```
+
+![3.3.45.png](assets/3.3/45.png)
+
+#### 3.3.8 基本动画
+
+##### 3.3.8.1 动画的基本步骤
+
+#### 3.3.9 高级动画
+
+##### 3.3.9.1 绘制小球
+
+#### 3.3.10 像素操作
+
+##### 3.3.10.1 ImageData对象
+
+#### 3.3.11 canvas 的优化
+
+##### 3.3.11.1 性能贴士
+
 ## 4、VUE2相关
 
 ## 5、VUE3相关
