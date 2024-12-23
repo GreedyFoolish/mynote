@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8"/>
+    <title>animation-photo</title>
+    <style>
+    </style>
+</head>
+<body>
+<canvas id="canvas" width="800" height="540"></canvas>
+
+<script type="text/javascript">
+    const img = new Image();
+    img.src = "./35.png";
+    // 控制图片过小时的重复数量
+    const repeat = 5;
+    const CanvasXSize = 800;
+    const CanvasYSize = 540;
+    const speed = 30;
+    const scale = 1.2;
+    const y = -4.5;
+    const dx = 0.75;
+    let imgWidth;
+    let imgHeight;
+    let x = 0;
+    let clearX;
+    let clearY;
+    let ctx;
+
+    img.onload = function () {
+        imgWidth = img.width * scale;
+        imgHeight = img.height * scale;
+        if (imgWidth > CanvasXSize) {
+            // 图片实际宽度大于画布宽度，设置水平偏移及清除范围
+            x = CanvasXSize - imgWidth;
+            clearX = imgWidth;
+        } else {
+            clearX = CanvasXSize;
+        }
+        if (imgHeight > CanvasYSize) {
+            // 图片实际高度大于画布高度，设置垂直清除范围
+            clearY = imgHeight;
+        } else {
+            clearY = CanvasYSize;
+        }
+        ctx = document.getElementById("canvas").getContext("2d");
+        return setInterval(draw, speed);
+    };
+
+    function draw() {
+        ctx.clearRect(0, 0, clearX, clearY); // 清空画布
+        if (imgWidth <= CanvasXSize) {
+            if (x > CanvasXSize) {
+                x = -imgWidth + x;
+            }
+            for (let i = 1; i < repeat; i++) {
+                if (x - imgWidth * i > 0) {
+                    ctx.drawImage(img, -imgWidth * i + x, y, imgWidth, imgHeight);
+                }
+            }
+        } else {
+            if (x > CanvasXSize) {
+                x = CanvasXSize - imgWidth;
+            }
+            if (x > CanvasXSize - imgWidth) {
+                // 添加无缝衔接的附图
+                ctx.drawImage(img, x - imgWidth + 1, y, imgWidth, imgHeight);
+            }
+        }
+        ctx.drawImage(img, x, y, imgWidth, imgHeight);
+        // 增加水平移动量
+        x += dx;
+    }
+</script>
+</body>
+</html>
+
