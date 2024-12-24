@@ -3638,13 +3638,449 @@ requestAnimationFrame()
 
 ##### 3.3.9.1 绘制小球
 
+为了画出小球，我们需要创建一个包含相关属性及`draw()`方法的`ball`对象完成绘制。
+
+```javascript
+// 完整代码详见animation-ball.html
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const ball = {
+  x: 100,
+  y: 100,
+  vx: 5,
+  vy: 3,
+  radius: 25,
+  color: "blue",
+  draw: function () {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  }
+}
+ball.draw();
+```
+
+##### 3.3.9.2 添加速率
+
+使用`window.requestAnimationFrame()`控制动画。给小球添加速率矢量进行移动。每次重新绘制需要使用`clearRect`清理掉之前帧里的圆形。
+
+```javascript
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ball.draw();
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+  raf = window.requestAnimationFrame(draw);
+}
+
+canvas.addEventListener("mouseover", function (e) {
+  raf = window.requestAnimationFrame(draw);
+});
+
+canvas.addEventListener("mouseout", function (e) {
+  window.cancelAnimationFrame(raf);
+});
+```
+
+##### 3.3.9.3 边界
+
+若不检测碰撞，小球很快就会超出画布。检查小球`x`和`y`是否超出画布的尺寸及是否需要将速度矢量反转。`draw`函数添加如下代码：
+
+```javascript
+if (ball.y + ball.vy > canvas.height || ball.y + ball.vy < 0) {
+  ball.vy = -ball.vy;
+}
+if (ball.x + ball.vx > canvas.width || ball.x + ball.vx < 0) {
+  ball.vx = -ball.vx;
+}
+```
+
+##### 3.3.9.4 加速度
+
+为了让小球运动更真实，可以对速度矢量进行如下处理。`draw`函数添加如下代码：
+
+```javascript
+// 小球会逐帧减少垂直方向的速度，所以小球最终将只会在地板上弹跳。
+ball.vy *= 0.99;
+ball.vy += 0.25;
+```
+
+##### 3.3.9.5 长尾效果
+
+清除前一帧动画使用的是`clearRect`函数。为了实现长尾效果，可以改用一个半透明的`fillRect`函数。`draw`函数添加如下代码：
+
+```javascript
+ctx.fillStyle = "rgba(255,255,255,0.3)";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+```
+
+##### 3.3.9.6 添加鼠标控制
+
+为了更好地控制小球，可以用`mousemove`事件让小球跟随鼠标移动。`click`事件会释放小球，让小球重新跳起。
+
+```javascript
+canvas.addEventListener("mousemove", function (e) {
+  if (!running) {
+    ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ball.x = e.offsetX;
+    ball.y = e.offsetY;
+    ball.draw();
+  }
+})
+canvas.addEventListener("click", function (e) {
+  if (!running) {
+    raf = window.requestAnimationFrame(draw);
+    running = true;
+  }
+})
+```
+
 #### 3.3.10 像素操作
 
 ##### 3.3.10.1 ImageData对象
 
+`ImageData`对象中存储着`canvas`对象真实像素数据，它包含以下几个只读属性：
+
+* `width`：图片宽度，单位是像素。
+* `height`：图片高度，单位是像素。
+* `data`：`Uint8ClampedArray`类型的一维数组，包含着`RGBA`格式的整型数据，范围在`0`至`255`之间（包括`255`）。
+* `Uint8ClampedArray`：包含`height`×`width`×`4`字节数据，索引值从`0`到(`height`×`width`×`4`)-`1`
+
+`data`属性返回一个`Uint8ClampedArray`，它可以被使用作为查看初始像素数据。每个像素用`4`个`1bytes`
+值（按照红，绿，蓝和透明值的顺序，即`RGBA`格式）来代表。每个颜色值区用`0`至`255`
+来代表。颜色值区会分配到在数组内连续的索引，像素左上角的红色值区在数组的索引`0`位置。像素处理从左至右，从上到下，遍历整个数组。
+
+根据行、列读取某像素点的`R/G/B/A`值的公式：
+
+````javascript
+imageData.data[行 * (imageData.width * 4) + 列 * 4 + 0 / 1 / 2 / 3];
+````
+
+读取像素数组的大小（以字节为单位）：
+
+```javascript
+const numBytes = imageData.data.length;
+```
+
+##### 3.3.10.2 创建ImageData对象
+
+创建一个新的，空白的`ImageData`对象，需要使用`createImageData()`方法。有`2`种重载用法。
+
+```javascript
+const myImageData = ctx.createImageData(width, height);
+// 创建一个 height × width 尺寸的新 ImageData 对象。所有像素被预设为透明黑。
+const myImageData = ctx.createImageData(anotherImageData);
+// 创建一个与 anotherImageData 对象相同像素的 ImageData 对象。这个新对象的所有像素被预设为透明黑。并非复制 anotherImageData 图片数据。
+```
+
+##### 3.3.10.3 获取场景像素数据
+
+获取包含画布场景像素数据的`ImageData`对象，可以用`getImageData()`方法：
+
+```javascript
+const myImageData = ctx.getImageData(left, top, width, height);
+// 这个方法会返回一个 ImageData 对象，它代表了画布区域的对象数据。此画布的区域为 (left, top) 到 (left + width, top + height) 的矩形。
+```
+
+**颜色选择器示例**
+
+```javascript
+// 详见imageData-getImageData.html文件
+const img = new Image();
+// 设置图片跨域资源共享
+img.crossOrigin = "anonymous";
+img.src = "https://mdn.github.io/shared-assets/images/examples/rhino.jpg";
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const hoveredColor = document.getElementById("hoveredColor");
+const selectedColor = document.getElementById("selectedColor");
+img.onload = function () {
+  ctx.drawImage(img, 0, 0);
+  img.style.display = "none";
+};
+
+function pick(event, destination) {
+  const x = event.layerX;
+  const y = event.layerY;
+  const pixel = ctx.getImageData(x, y, 1, 1);
+  const data = pixel.data;
+  const rgba = `rgba(${data[0]}, ${data[1]}, ${data[2]}, ${data[3] / 255})`;
+  destination.style.background = rgba;
+  destination.textContent = rgba;
+  return rgba;
+}
+
+canvas.addEventListener("mousemove", function (event) {
+  pick(event, hoveredColor);
+});
+canvas.addEventListener("click", function (event) {
+  pick(event, selectedColor);
+});
+```
+
+##### 3.3.10.4 在场景中写入像素数据
+
+使用`putImageData()`方法对场景进行像素数据的写入操作。
+
+```javascript
+ctx.putImageData(myImageData, dx, dy);
+// dx 和 dy 表示像素数据在画布中绘制的起始水平，垂直坐标
+```
+
+**颜色选择器示例**
+
+```javascript
+// 详见imageData-putImageData.html文件
+const img = new Image();
+// 设置图片跨域资源共享
+img.crossOrigin = "anonymous";
+img.src = "https://mdn.github.io/shared-assets/images/examples/rhino.jpg";
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+img.onload = function () {
+  ctx.drawImage(img, 0, 0);
+};
+
+const original = function () {
+  ctx.drawImage(img, 0, 0);
+};
+
+const grayscale = function () {
+  ctx.drawImage(img, 0, 0);
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+    data[i] = avg;
+    data[i + 1] = avg;
+    data[i + 2] = avg;
+  }
+  ctx.putImageData(imageData, 0, 0);
+};
+
+const invert = function () {
+  ctx.drawImage(img, 0, 0);
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = 255 - data[i];
+    data[i + 1] = 255 - data[i + 1];
+    data[i + 2] = 255 - data[i + 2];
+  }
+  ctx.putImageData(imageData, 0, 0);
+}
+
+const sepia = function () {
+  ctx.drawImage(img, 0, 0);
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    data[i] = r * 0.393 + g * 0.769 + b * 0.189;
+    data[i + 1] = r * 0.349 + g * 0.686 + b * 0.168;
+    data[i + 2] = r * 0.272 + g * 0.534 + b * 0.131;
+  }
+  ctx.putImageData(imageData, 0, 0);
+};
+
+const inputs = document.querySelectorAll("[name=filter]");
+for (const input of inputs) {
+  input.addEventListener("change", function (e) {
+    switch (e.target.value) {
+      case "original":
+        return original();
+      case "grayscale":
+        return grayscale();
+      case "inverted":
+        return invert();
+      case "sepia":
+        return sepia();
+      default:
+        return original();
+    }
+  });
+}
+```
+
+##### 3.3.10.5 缩放和抗锯齿
+
+通过设置`imageSmoothingEnabled`属性可以实现抗锯齿的效果（默认开启抗锯齿）。
+
+**图片放大镜示例**
+
+根据鼠标位置裁切指定大小的图片，将其复制到另一个画布并调整到期望的大小。本例为将`10×10`像素裁切为`200×200`像素。
+
+```javascript
+// 详见imageData-anti-aliasing.html文件
+const img = new Image();
+img.src = "https://mdn.github.io/shared-assets/images/examples/rhino.jpg";
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+img.onload = function () {
+  img.style.display = "none";
+  draw(this);
+};
+
+function draw(img) {
+  ctx.drawImage(img, 0, 0);
+  const zoomCtx = document.getElementById("zoom").getContext("2d");
+  const smoothBtn = document.getElementById("smoothButton");
+  const toggleSmoothing = function (event) {
+    zoomCtx.imageSmoothingEnabled = this.checked;
+    zoomCtx.mozImageSmoothingEnabled = this.checked;
+    zoomCtx.webkitImageSmoothingEnabled = this.checked;
+    zoomCtx.msImageSmoothingEnabled = this.checked;
+  };
+  smoothBtn.addEventListener("change", toggleSmoothing);
+  const zoom = function (event) {
+    const x = event.layerX;
+    const y = event.layerY;
+    zoomCtx.drawImage(canvas, Math.abs(x - 5), Math.abs(y - 5), 10, 10, 0, 0, 200, 200);
+  };
+  canvas.addEventListener("mousemove", zoom);
+}
+```
+
+##### 3.3.10.6 保存图片
+
+`toDataURL()`返回一个包含图片展示的数据链接`data URI`。可以使用`type`指定其类型，默认为`PNG`格式。图片的分辨率为`96dpi`。
+
+```javascript
+toDataURL(type, encoderOptions)
+// type：图片格式，默认为 image/png
+// encoderOptions：在指定图片格式为 image/jpeg 或 image/webp 的情况下，可以从 0 到 1 的区间内选择图片的质量。
+// 1 表示最好品质，0 基本不被辨析但有比较小的文件大小。如果超出取值范围，将会使用默认值 0.92。其他参数会被忽略。
+```
+
+* 如果画布的高度或宽度是`0`，那么会返回字符串`data:,`。
+* 如果传入的类型非`image/png`，但是返回的值以`data:image/png`开头，那么该传入的类型是不支持的。
+* `Chrome`支持`image/webp`类型。
+
+**当在画布中生成了一个`data URI`，它可以用于任何`<image>`元素，或放在一个有`download`
+属性的超链接里用于保存到本地。也可以用画布创建一个`Blob`对象。**
+
+`toBlob()`创造`Blob`对象，用以展示`canvas`上的图片。这个图片文件可以被缓存或保存到本地（由用户代理自行决定）。
+
+可以在调用时指定所需的文件格式和图像质量，若未指定文件格式（或不支持指定的文件格式），则默认导出`image/png`
+类型。浏览器需要支持`image/png`，大多数浏览器还支持额外的图片格式，包括`image/jpeg`和`image/webp`。
+
+对于支持以指定分辨率编码的图片格式，如不特别指明，图片的默认分辨率为`96dpi`。
+
+```javascript
+canvas.toBlob(callback, type, quality)
+// callback：回调函数，可获得一个单独的 Blob 对象参数。如果图像未被成功创建，可能会获得 null 值。
+// type：指定图片格式，默认格式（未指定或不支持）为 image/png。
+// quality：值在 0 与 1 之间，当请求图片格式为 image/jpeg 或者 image/webp 时用来指定图片展示质量。
+// 如果这个参数的值不在指定类型与范围之内，则使用默认值，其余参数将被忽略。
+```
+
 #### 3.3.11 canvas 的优化
 
-##### 3.3.11.1 性能贴士
+参考：https://www.cnblogs.com/fangsmile/p/14721283.html
+
+##### 3.3.11.1 在离屏Canvas上预渲染相似的图形或重复的对象
+
+如果发现自己在每个动画帧上存在一些重复绘制操作，请考虑将其分流到屏幕外的画布上。然后，你可以根据需要将屏幕外的图像渲染到主画布上，而不必重复生成该图像的步骤。
+
+```javascript
+myEntity.offscreenCanvas = document.createElement("canvas");
+myEntity.offscreenCanvas.width = myEntity.width;
+myEntity.offscreenCanvas.height = myEntity.height;
+myEntity.offscreenContext = myEntity.offscreenCanvas.getContext("2d");
+
+myEntity.render(myEntity.offscreenContext);
+```
+
+##### 3.3.11.2 避免浮点数的坐标点，用整数取而代之
+
+**当绘制存在浮点数坐标点的对象时会发生子像素渲染。**
+
+浏览器为了达到抗锯齿的效果会做额外的运算。为了避免这种情况，请保证在调用`drawImage()`函数时，用`Math.floor()`函数对所有的坐标点取整。
+
+##### 3.3.11.3 使用drawImage时不要缩放图像
+
+在离屏`canvas`中缓存图片的不同尺寸，而不要用`drawImage()`去缩放它们。
+
+##### 3.3.11.4 将复杂的场景分解为多层画布
+
+项目可能会出现某些对象需要经常移动或更改，而其他对象则保持相对静态。在这种情况下，可以使用多个`<canvas>`元素对项目进行分层进行优化。
+
+例如，假设你有一个游戏，其 UI 位于顶部，中间是游戏性动作，底部是静态背景。
+
+```html
+<!-- 在这种情况下，可以将游戏分成三个 canvas 层。UI 将仅在用户输入时发生变化，游戏层随每个新框架发生变化，背景层通常保持不变。 -->
+<div id="stage">
+  <canvas id="ui-layer" width="480" height="320"></canvas>
+  <canvas id="game-layer" width="480" height="320"></canvas>
+  <canvas id="background-layer" width="480" height="320"></canvas>
+</div>
+<style>
+  #stage {
+    width: 480px;
+    height: 320px;
+    position: relative;
+    border: 2px solid black;
+  }
+
+  canvas {
+    position: absolute;
+  }
+
+  #ui-layer {
+    z-index: 3;
+  }
+
+  #game-layer {
+    z-index: 2;
+  }
+
+  #background-layer {
+    z-index: 1;
+  }
+</style>
+```
+
+##### 3.3.11.5 用CSS设置大的背景图
+
+如大多数游戏那样，你有一张静态的背景图，用一个静态的`<div>`元素，结合`background`特性，以及将它置于画布元素之后。这么做可以避免在每一帧在画布上绘制背景图。
+
+##### 3.3.11.6 用CSS变换特性缩放画布
+
+`CSS`变换使用`GPU`，因此速度更快。最好的情况是不直接缩放画布，或具有较小的画布并按比例放大，而不是较大的画布并按比例缩小。
+
+```javascript
+const scaleX = window.innerWidth / canvas.width;
+const scaleY = window.innerHeight / canvas.height;
+const scaleToFit = Math.min(scaleX, scaleY);
+const scaleToCover = Math.max(scaleX, scaleY);
+// 从左上角开始缩放。等同于 transform-origin: left top;
+stage.style.transformOrigin = "0 0";
+stage.style.transform = "scale(" + scaleToFit + ")";
+```
+
+##### 3.3.11.7 关闭透明度
+
+如果项目使用的画布且不需要透明。在`getContext()`创建一个绘图上下文时把`alpha`选项设置为`false`。这个选项可以帮助浏览器进行内部优化。
+
+```javascript
+const ctx = canvas.getContext("2d", {alpha: false});
+```
+
+##### 3.3.11.8 更多建议
+
+* 合并绘制操作：将画布的函数调用集合到一起（例如，绘制一条折线，而不是分成多条直线进行绘制）。
+* 减少状态变化：避免不必要的画布状态改变。
+* 局部重绘：渲染画布中的差异点，而非重绘整个画布。
+* 尽可能避免`shadowBlur`特性。
+* 尽可能避免`text rendering`。
+* 尝试不同的方法来清除画布（`clearRect()`，`fillRect()`，调整`canvas`大小）。
+* 绘制动画使用`Window.requestAnimationFrame()`，而非`setInterval()`。
+* 谨慎使用大型物理库
 
 ## 4、VUE2相关
 

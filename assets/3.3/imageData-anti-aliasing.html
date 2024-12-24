@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8"/>
+    <title>imageData-anti-aliasing</title>
+    <style>
+    </style>
+</head>
+<body>
+<canvas id="canvas" width="300" height="227"></canvas>
+<canvas id="zoom" width="300" height="227"></canvas>
+<div>
+    <input type="checkbox" name="smoothButton" id="smoothButton" checked/>
+    <label for="smoothButton">抗锯齿</label>
+</div>
+
+
+<script type="text/javascript">
+    const img = new Image();
+    img.src = "https://mdn.github.io/shared-assets/images/examples/rhino.jpg";
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    img.onload = function () {
+        img.style.display = "none";
+        draw(this);
+    };
+
+    function draw(img) {
+        ctx.drawImage(img, 0, 0);
+        const zoomCtx = document.getElementById("zoom").getContext("2d");
+        const smoothBtn = document.getElementById("smoothButton");
+        const toggleSmoothing = function (event) {
+            zoomCtx.imageSmoothingEnabled = this.checked;
+            zoomCtx.mozImageSmoothingEnabled = this.checked;
+            zoomCtx.webkitImageSmoothingEnabled = this.checked;
+            zoomCtx.msImageSmoothingEnabled = this.checked;
+        };
+        smoothBtn.addEventListener("change", toggleSmoothing);
+        const zoom = function (event) {
+            const x = event.layerX;
+            const y = event.layerY;
+            zoomCtx.drawImage(canvas, Math.abs(x - 5), Math.abs(y - 5), 10, 10, 0, 0, 200, 200);
+        };
+        canvas.addEventListener("mousemove", zoom);
+    }
+</script>
+</body>
+</html>
+

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8"/>
+    <title>imageData-getImageData</title>
+    <style>
+        .wrap {
+            display: flex;
+        }
+
+        .imageText, .hoveredText, .selectedText {
+            width: 200px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+        }
+
+        .imageText {
+            width: 300px;
+        }
+
+        #hoveredColor, #selectedColor {
+            width: 200px;
+            height: 227px;
+            line-height: 227px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="imageText">
+        原图
+    </div>
+    <div class="hoveredText">
+        hover颜色
+    </div>
+    <div class="selectedText">
+        click颜色
+    </div>
+</div>
+<div class="wrap">
+    <canvas id="canvas" width="300" height="227"></canvas>
+    <div id="hoveredColor"></div>
+    <div id="selectedColor"></div>
+</div>
+
+<script type="text/javascript">
+    const img = new Image();
+    // 设置图片跨域资源共享
+    img.crossOrigin = "anonymous";
+    img.src = "https://mdn.github.io/shared-assets/images/examples/rhino.jpg";
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const hoveredColor = document.getElementById("hoveredColor");
+    const selectedColor = document.getElementById("selectedColor");
+    img.onload = function () {
+        img.style.display = "none";
+        ctx.drawImage(img, 0, 0);
+    };
+
+    function pick(event, destination) {
+        const x = event.layerX;
+        const y = event.layerY;
+        const pixel = ctx.getImageData(x, y, 1, 1);
+        const data = pixel.data;
+        const rgba = `rgba(${data[0]}, ${data[1]}, ${data[2]}, ${data[3] / 255})`;
+        destination.style.background = rgba;
+        destination.textContent = rgba;
+        return rgba;
+    }
+
+    canvas.addEventListener("mousemove", function (event) {
+        pick(event, hoveredColor);
+    });
+    canvas.addEventListener("click", function (event) {
+        pick(event, selectedColor);
+    });
+</script>
+</body>
+</html>
+
