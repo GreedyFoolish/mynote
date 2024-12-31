@@ -4875,9 +4875,152 @@ fill-rule = type
 
 ![3.4.14.png](assets/3.4/14.png)
 
-###### 3.4.4.1. 令
+##### 3.4.4.3 使用CSS设置样式
 
-![3.4.1.png](assets/3.4/1.png)
+可以通过`CSS`来设置填充和描边。语法和`HTML`里使用`CSS`一样，只需要把`background-color`、`border`改成`fill`和`stroke`
+。注意，不是所有的属性都能用`CSS`来设置。上色和填充的部分一般是可以用`CSS`来设置的，比如`fill`，`stroke`，`stroke-dasharray`
+等，但是不包括渐变和图案等功能。另外，`width`、`height`，以及路径的命令等，都不能用`CSS`设置。
+
+```svg
+
+<svg version="1.1"
+     baseProfile="full"
+     width="200" height="200"
+     xmlns="http://www.w3.org/2000/svg">
+  <!--
+    <defs> 表示定义，这里面可以定义一些不会在 SVG 图形中出现、但是可以被其他元素使用的元素。
+    可以使用hover这样的伪类来创建翻转之类的效果
+    一些可以在 HTML 里使用的 CSS，在 svg 里可能无法正常工作，比如before和after伪类。
+  -->
+  <defs>
+    <style>
+      <![CDATA[
+        #MyRect {
+          stroke: black;
+          fill: red;
+        }
+        #MyRect:hover {
+          stroke: black;
+          fill: blue;
+        }
+      ]]>
+    </style>
+  </defs>
+  <rect width="100%" height="100%" fill="white"/>
+  <rect x="10" y="10" width="180" height="180" id="MyRect"/>
+  <!-- CSS 可以利用 style 属性插入到元素的行间 -->
+  <rect x="10" y="10" width="180" height="180" style="stroke: black; fill: green;"/>
+</svg>
+```
+
+![3.4.15.png](assets/3.4/15.png)
+
+#### 3.4.5 渐变
+
+##### 3.4.5.1 线性渐变
+
+线性渐变沿着直线改变颜色。线性渐变需要在`SVG`文件的`defs`元素内部，创建一个`<linearGradient>`元素。
+
+线性渐变内部有几个`stop`结点，这些结点通过指定位置的`offset`（偏移）和`stop-color`
+（颜色中值）来说明在渐变的特定位置上应该是什么颜色；可以直接指定这两个属性值，也可以通过`CSS`
+来指定他们的值，该例子中混合使用了这两种方法。你可以根据需求按照自己的喜好插入很多中间颜色，但是偏移量应该始终从`0%`
+开始（或`0`，百分号可省略），到`100%`（或`1`）结束。如果`stop`设置的位置有重合，将使用`XML`
+树中较晚设置的值。类似于填充和描边，通过指定属性`stop-opacity`来设置某个位置的半透明度。
+
+详见`linearGradient.svg`文件。
+
+##### 3.4.5.2 径向渐变
+
+径向渐变与线性渐变相似，只是它是从一个点开始发散绘制渐变。径向渐变需要在`SVG`文件的`defs`中创建一个`<radialGradient>`元素。
+
+详见`radialGradient.svg`文件。
+
+`spreadMethod`属性定义了当渐变到达边缘时的行为，但此时该对象尚未被填充颜色。
+
+* `pad`（默认值）：衬垫效果。当渐变到达终点时，最终的偏移颜色被用于填充对象剩下的空间。
+* `reflect`：反射效果。会让渐变一直持续下去，效果是与渐变本身是相反的，以`100%`偏移位置的颜色开始，渐变到`0%`
+  位置的颜色，然后再渐变`100%`位置的颜色。
+* `repeat`：重复效果。会让渐变一直持续下去，效果是与渐变本身是相同的，它会跳回到最初的颜色然后继续渐变。
+
+线性和径向渐变都有`gradientUnits`（渐变单元）属性，它定义了用来描述渐变的大小和方向的单元系统。
+
+* `objectBoundingBox`（默认值）：表示使用渐变元素的矩形百分比指定位置大小。设置`0`到`1`的坐标值，渐变单元就会自动缩放到渐变元素对应大小。
+* `userSpaceOnUse`：表示几何属性的所有坐标都是应用时定义的用户坐标系。
+
+详见`radialGradient-spreadMethod.svg`文件。
+
+#### 3.4.6 图案
+
+图案`patterns`是`SVG`中用到的最让人混淆的填充类型之一。`<pattern>`需要定义在`SVG`文件的`<defs>`内。在`patterns`
+元素可以包含任何之前包含的其他基本形状，并且每个形状都可以使用之前学习过（包括渐变和半透明）的任何样式。
+
+详见`pattern.svg`文件。
+
+`patterns`元素上定义了`width`和`height`属性，用于描述图案容器的标准宽高（绘制一份图案）。可以使用`x`和`y`属性添加初始偏移。
+
+`patterns`的`patternsUnits`（图案单元）属性，它定义了用来描述图案容器（绘制一份图案）的大小和方向的单元系统。
+
+* `objectBoundingBox`（默认值）：表示使用图案元素的矩形百分比指定位置大小。设置`0`到`1`的坐标值，图案单元就会自动缩放到图案元素对应大小。
+* `userSpaceOnUse`：表示几何属性的所有坐标都是应用时定义的用户坐标系。
+
+`patterns`的`patternsContentUnits`（图案内容单元）属性，用于描述`patterns`元素基于基本图形使用的单元系统。
+
+* `objectBoundingBox`：表示使用图案元素的矩形百分比指定位置大小。设置`0`到`1`的坐标值，图案内容单元就会自动缩放到图案元素对应大小。
+* `userSpaceOnUse`（默认值）：表示几何属性的所有坐标都是应用时定义的用户坐标系。
+
+**需要指定`patternsContentUnits`和`patternsUnits`中的一个，否则`patterns`中绘制的图形和`patterns`元素使用的坐标系不同。**
+
+如果图案改变了大小，`patterns`会自适应其大小，但是图案里的图形不会自适应。
+
+* `patternContentUnits`设置为`objectBoundingBox`时，`pattern`会自动缩放以保证`pattern`内部的图形数目和重复不变。
+* `patternUnits`设置为`userSpaceOnUse`时，`pattern`本身会保持不变，只是重复更多次去填充。
+
+`objectBoundingBox`如果在`Gecko`绘制半径设小于`0.075`圆，绘制可能会出现问题。应尽量避免在`objectBoundingBox`单元绘制图形。
+
+详见`pattern-compare.svg`文件。
+
+#### 3.4.7 文本
+
+`SVG`两种文本模式：一种是写在图像中的文本，另一种是`SVG`字体。
+
+##### 3.4.7.1 text元素
+
+`text`元素定义了一个由文字组成的图形。
+
+**注意：`text`上可以使用渐变、图案、剪切路径、遮罩或滤镜。**
+
+* `x`和`y`属性设置文本在视口中显示的位置。
+* `text-anchor`属性用来描述该文本与所给点的对齐方式：`start`（开头对齐）、`middle`（中间对齐）、`end`（末尾对齐）或`inherit`（继承）。
+* `fill`属性设置文本填充颜色。
+* `stroke`属性设置文本描边颜色，可以使用渐变或图案。
+* `font-family`：允许通过给定一个有先后顺序的，由字体名或字体族名组成的列表来为选定的元素设置字体。
+* `font-style`：字体中选择`normal`（正常）、`italic`（斜体）或`oblique`（斜体，可加角度）的字体外观。
+* `font-weight`：设置字体的粗细程度。一些字体只提供`normal`（正常）和`bold`（加粗）两种值。
+* `font-variant`：用于设置文本的字体变体。主要用于控制小型大写字母（`small-caps`）的显示，即所有的小写字母都会被转换为大写字母，但是字体大小会比正常的大写字母小。
+* `font-stretch`：字体中选择`normal`（正常）、`semi-condensed、condensed、extra-condensed、ultra-condensed`
+  （紧凑）或`semi-expanded、expanded、extra-expanded、ultra-expanded`（扩展）的字体外观。
+* `font-size`：设置字体大小。
+* `font-size-adjust`：定义字体大小应取决于小写字母，而不是大写字母。在字体较小时，字体的可读性主要由小写字母的大小决定，通过此选项即可进行调整。
+* `letter-spacing`：用于设置文本字符的间距表现。
+* `word-spacing`：设置标签、单词之间的空格长度。
+* `text-decoration`：设置文本上的装饰性线条的外观。比如下划线。
+
+##### 3.4.7.2 tspan元素
+
+`tspan`元素用来标记文本的子部分，它必须是一个`text`元素或别的`tspan`元素的子元素。一个典型的用法是把句子中的一个词变成粗体红色。
+
+* `x`：为容器设置一个新绝对`x`坐标。它覆盖了默认的当前的文本位置。可以接收一个数列，将逐个应用到`tspan`元素内的每一个字符。
+* `y`：为容器设置一个新绝对`y`坐标。它覆盖了默认的当前的文本位置。可以接收一个数列，将逐个应用到`tspan`元素内的每一个字符。
+* `dx`：从当前位置，用一个水平偏移开始绘制文本。可以接收一个数列，将逐个应用到`tspan`元素内的每一个字符并累计偏移。
+* `dy`：从当前位置，用一个垂直偏移开始绘制文本。可以接收一个数列，将逐个应用到`tspan`元素内的每一个字符并累计偏移。
+* `rotate`：把所有的字符旋转一个角度。可以接收一个数列，则使每个字符旋转分别旋转到那个值，剩下的字符根据最后一个值旋转。
+* `textLength`：这是一个很模糊的属性，给出字符串的计算长度。如果度量的文字和长度不满足`textLength`，则允许渲染引擎精细调整字型的位置。
+
+##### 3.4.7.3 textPath元素
+
+`textPath`元素将文本放置在其内部，并通过`xlink:href`属性值引用`<path>`元素，就可以让文字块呈现在`<path>`元素给定的路径上了。
+
+详见`text.svg`文件。
 
 ## 4、VUE2相关
 

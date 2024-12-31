@@ -1,0 +1,36 @@
+<svg version="1.1"
+     baseProfile="full"
+     width="120" height="240"
+     xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="Gradient1">
+            <stop class="stop1" offset="0%"/>
+            <stop class="stop2" offset="50%"/>
+            <stop class="stop3" offset="100%"/>
+        </linearGradient>
+        <!--
+            x1、x2、y1 和 y2指定了渐变的大小和范围。渐变的方向可以通过 x1、x2、y1 和 y2 来控制，这些属性定义了渐变的方向。
+            渐变色默认是水平方向的，但是通过修改这些属性，就可以改变该方向。例如 Gradient2 创建了一个垂直渐变。
+        -->
+        <linearGradient id="Gradient2" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="red" stop-opacity="0.5"/>
+            <stop offset="50%" stop-color="black" stop-opacity="0"/>
+            <stop offset="100%" stop-color="blue"/>
+        </linearGradient>
+        <style type="text/css">
+            <![CDATA[
+                #rect1 { fill: url(#Gradient1); }
+                .stop1 { stop-color: red; }
+                .stop2 { stop-color: black; stop-opacity: 0; }
+                .stop3 { stop-color: blue; }
+            ]]>
+        </style>
+    </defs>
+    <rect width="100%" height="100%" fill="white"/>
+    <rect id="rect1" x="10" y="10" rx="15" ry="15" width="100" height="100"/>
+    <!--
+        使用渐变时，需要在一个对象的 fill 或stroke 中引用它，这和在 CSS 中使用 url 引用元素的方法一样。
+        将 fill 设置为 url(#Gradient) 即可添加渐变。可以用同样的方式处理stroke。
+    -->
+    <rect x="10" y="120" rx="15" ry="15" width="100" height="100" fill="url(#Gradient2)"/>
+</svg>

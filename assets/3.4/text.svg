@@ -1,0 +1,29 @@
+<svg version="1.1"
+     baseProfile="full"
+     width="200" height="200"
+     xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .text {
+        font: italic 16px serif;
+        }
+        .tspan {
+        font: bold 14px sans-serif;
+        fill: red;
+        }
+    </style>
+    <rect width="100%" height="100%" fill="white"/>
+    <text x="0" y="30" font-family="Verdana" font-size="24" font-size-adjust="28" font-style="normal">
+        Text
+    </text>
+    <text x="0" y="50" class="text">
+        This is
+        <tspan x="40" y="60" dx="20,10,5" dy="2,4,6,8,-8,-6,-4,-2" class="tspan">bold and red</tspan>
+        word！
+    </text>
+    <path id="my_path" d="M 20,110 C 40,130 80,130 100,110" fill="transparent"/>
+    <text>
+        <textPath xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#my_path">
+            This text follows a curve.
+        </textPath>
+    </text>
+</svg>
