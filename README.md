@@ -307,7 +307,7 @@ function scrollToTop() {
 
 ### 1.6 CSS实现自动换行、强制换行、强制不换行的属性
 
-1. 自动换行：
+* 自动换行：
 
 ```vue
 
@@ -319,7 +319,7 @@ function scrollToTop() {
 </style>
 ```
 
-2. 强制换行：
+* 强制换行：
 
 ```vue
 
@@ -333,9 +333,9 @@ function scrollToTop() {
 </style>
 ```
 
-* 注意：单词换行需要父盒子为块级元素
+**注意：单词换行需要父盒子为块级元素**
 
-3. 强制不换行：
+* 强制不换行：
 
 ```vue
 
@@ -4457,10 +4457,7 @@ c dx1 dy1, dx2 dy2, dx dy
     从左往右看，控制点在水平方向上逐渐分开。从上往下看，控制点和曲线坐标之间离得越来越远。
     曲线沿着起点到第一控制点的方向伸出，逐渐弯曲，然后沿着第二控制点到终点的方向结束。
 -->
-<svg version="1.1"
-     baseProfile="full"
-     width="190" height="160"
-     xmlns="http://www.w3.org/2000/svg">
+<svg version="1.1" baseProfile="full" width="190" height="160" xmlns="http://www.w3.org/2000/svg">
   <rect width="190" height="160" fill="white"/>
   <path d="M 10 10 C 20 20, 40 20, 50 10" stroke="black" fill="transparent"/>
   <path d="M 70 10 C 70 20, 110 20, 110 10" stroke="black" fill="transparent"/>
@@ -4490,10 +4487,7 @@ s dx2 dy2, dx dy
 
 ```svg
 <!-- 图中左侧红色标记的点对应的控制点即为蓝色标记点 -->
-<svg version="1.1"
-     baseProfile="full"
-     width="190" height="160"
-     xmlns="http://www.w3.org/2000/svg">
+<svg version="1.1" baseProfile="full" width="190" height="160" xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="white"/>
   <path d="M 10 80 C 40 10, 65 10, 95 80 S 150 150, 180 80" fill="transparent" stroke="black"/>
 </svg>
@@ -4515,10 +4509,7 @@ q dx1 dy1, dx dy
 
 ```svg
 
-<svg version="1.1"
-     baseProfile="full"
-     width="190" height="160"
-     xmlns="http://www.w3.org/2000/svg">
+<svg version="1.1" baseProfile="full" width="190" height="160" xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="white"/>
   <path d="M 10 80 Q 95 10 180 80" stroke="black" fill="transparent"/>
 </svg>
@@ -4538,10 +4529,7 @@ q dx1 dy1, dx dy
 
 ```svg
 <!-- 图中左侧红色标记的点对应的控制点即为蓝色标记点。 -->
-<svg version="1.1"
-     baseProfile="full"
-     width="190" height="160"
-     xmlns="http://www.w3.org/2000/svg">
+<svg version="1.1" baseProfile="full" width="190" height="160" xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="white"/>
   <path d="M 10 80 Q 52.5 10, 95 80 T 180 80" stroke="black" fill="transparent"/>
 </svg>
@@ -4577,10 +4565,7 @@ a rx ry x-axis-rotation large-arc-flag sweep-flag dx dy
     图中的两个椭圆弧(x 半径 30, y 半径 50)被对角线切开。第一个椭圆弧的 x-axis-rotation 是 0，所以弧形所在的椭圆是正置的（没有倾斜）。
     第二个椭圆弧的 x-axis-rotation 是 -45，所以这是一个旋转了 -45° 的椭圆，并以短轴为分割线，形成了两个对称的弧形。
 -->
-<svg version="1.1"
-     baseProfile="full"
-     width="320" height="320"
-     xmlns="http://www.w3.org/2000/svg">
+<svg version="1.1" baseProfile="full" width="320" height="320" xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="white"/>
   <path d="M 10 315
            L 110 215
@@ -4595,10 +4580,7 @@ a rx ry x-axis-rotation large-arc-flag sweep-flag dx dy
 
 ```svg
 <!-- 上图没有旋转的椭圆，因为两点连线（即对角线）穿过了椭圆的中心，所以只有 2 种弧形可以选择。如下图所示为一般情况，会有两个椭圆，4 种弧。 -->
-<svg version="1.1"
-     baseProfile="full"
-     width="320" height="320"
-     xmlns="http://www.w3.org/2000/svg">
+<svg version="1.1" baseProfile="full" width="320" height="320" xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="white"/>
   <path d="M 10 315
            L 110 215
@@ -4623,10 +4605,7 @@ a rx ry x-axis-rotation large-arc-flag sweep-flag dx dy
     large-arc-flag 决定弧线是大于还是小于 180 度，0 表示小角度弧，1 表示大角度弧。
     sweep-flag 表示弧线的方向，0 表示从起点到终点沿逆时针画弧，1 表示从起点到终点沿顺时针画弧。
 -->
-<svg version="1.1"
-     baseProfile="full"
-     width="350" height="350"
-     xmlns="http://www.w3.org/2000/svg">
+<svg version="1.1" baseProfile="full" width="350" height="350" xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="white"/>
   <path d="M 80 80
            A 45 45, 0, 0, 0, 125 125
@@ -4657,13 +4636,9 @@ a rx ry x-axis-rotation large-arc-flag sweep-flag dx dy
 
 ```svg
 <!-- 绘制了一个背景为紫色，边框为蓝色的 100*100px 的矩形 -->
-<svg version="1.1"
-     baseProfile="full"
-     width="120" height="120"
-     xmlns="http://www.w3.org/2000/svg">
+<svg version="1.1" baseProfile="full" width="120" height="120" xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="white"/>
-  <rect x="10" y="10" width="100" height="100" stroke="blue" fill="purple"
-        fill-opacity="0.5" stroke-opacity="0.8"/>
+  <rect x="10" y="10" width="100" height="100" stroke="blue" fill="purple" fill-opacity="0.5" stroke-opacity="0.8"/>
 </svg>
 ```
 
@@ -4704,10 +4679,7 @@ fill-rule = type
 
 ```svg
 <!-- stroke-linecap 的三种形式 -->
-<svg version="1.1"
-     baseProfile="full"
-     width="160" height="120"
-     xmlns="http://www.w3.org/2000/svg">
+<svg version="1.1" baseProfile="full" width="160" height="120" xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="white"/>
   <line x1="40" x2="120" y1="20" y2="20" stroke="black" stroke-width="20" stroke-linecap="butt"/>
   <line x1="40" x2="120" y1="60" y2="60" stroke="black" stroke-width="20" stroke-linecap="square"/>
@@ -4728,10 +4700,7 @@ fill-rule = type
 
 ```svg
 <!-- stroke-linejoin 的三种形式 -->
-<svg version="1.1"
-     baseProfile="full"
-     width="160" height="280"
-     xmlns="http://www.w3.org/2000/svg">
+<svg version="1.1" baseProfile="full" width="160" height="280" xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="white"/>
   <polyline points="40 60 80 20 120 60" stroke="black" stroke-width="20"
             stroke-linecap="butt" fill="none" stroke-linejoin="miter"/>
@@ -4773,10 +4742,7 @@ fill-rule = type
 
 ```svg
 
-<svg version="1.1"
-     baseProfile="full"
-     width="200" height="150"
-     xmlns="http://www.w3.org/2000/svg">
+<svg version="1.1" baseProfile="full" width="200" height="150" xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="white"/>
   <path d="M 10 75 Q 50 10 100 75 T 190 75" stroke="black"
         stroke-linecap="round" stroke-dasharray="5,10,5" fill="none"/>
@@ -4806,9 +4772,7 @@ fill-rule = type
 
 ```svg
 
-<svg version="1.1"
-     baseProfile="full"
-     width="320" height="120" viewBox="-10 -10 320 120"
+<svg version="1.1" baseProfile="full" width="320" height="120" viewBox="-10 -10 320 120"
      xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="white"/>
   <!-- nonzero 填充规则被用于路径段会相交的形状上的效果 -->
@@ -4842,9 +4806,7 @@ fill-rule = type
 
 ```svg
 
-<svg version="1.1"
-     baseProfile="full"
-     width="320" height="120" viewBox="-10 -10 320 120"
+<svg version="1.1" baseProfile="full" width="320" height="120" viewBox="-10 -10 320 120"
      xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="white"/>
   <!-- evenodd 填充规则被用于路径段会相交的形状上的效果 -->
@@ -4883,10 +4845,7 @@ fill-rule = type
 
 ```svg
 
-<svg version="1.1"
-     baseProfile="full"
-     width="200" height="200"
-     xmlns="http://www.w3.org/2000/svg">
+<svg version="1.1" baseProfile="full" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
   <!--
     <defs> 表示定义，这里面可以定义一些不会在 SVG 图形中出现、但是可以被其他元素使用的元素。
     可以使用hover这样的伪类来创建翻转之类的效果
@@ -4951,6 +4910,8 @@ fill-rule = type
 
 #### 3.4.6 图案
 
+##### 3.4.6.1 图案
+
 图案`patterns`是`SVG`中用到的最让人混淆的填充类型之一。`<pattern>`需要定义在`SVG`文件的`<defs>`内。在`patterns`
 元素可以包含任何之前包含的其他基本形状，并且每个形状都可以使用之前学习过（包括渐变和半透明）的任何样式。
 
@@ -4978,6 +4939,38 @@ fill-rule = type
 `objectBoundingBox`如果在`Gecko`绘制半径设小于`0.075`圆，绘制可能会出现问题。应尽量避免在`objectBoundingBox`单元绘制图形。
 
 详见`pattern-compare.svg`文件。
+
+##### 3.4.6.2 嵌入光栅图像
+
+`SVG`的`<image>`元素允许在一个`SVG`对象内部添加光栅图像（`<image>`元素至少需要支持`PNG`、`JPG`和`SVG`格式文件）。
+
+嵌入的图像变成一个普通的`SVG`元素。可以在其内容上用剪切、遮罩、滤镜、旋转以及其他`SVG`工具。
+
+```svg
+
+<svg version="1.1" baseProfile="full" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <image x="90" y="-65" width="128" height="146" transform="rotate(45)"
+         xlink:href="https://developer.mozilla.org/zh-CN/docs/Web/SVG/Element/image/mdn_logo_only_color.png"/>
+</svg>
+```
+
+**注意事项：**
+
+* 如果没有设置`x`或`y`属性，会自动设置为`0`。
+* 如果没有设置`width`或`height`属性，会自动设置为`0`。
+* 如果`width`或`height`等于`0`，则不会绘制这个图像。
+
+##### 3.4.6.3 嵌入XML
+
+参考：https://www.cnblogs.com/fangsmile/p/11649683.html
+https://developer.mozilla.org/zh-CN/docs/Web/MathML/Authoring
+
+`SVG`是一个`XML`应用，所以可以在`SVG`文档的任何位置嵌入任意`XML`。通常不会定义其他`SVG`对此`SVG`的影响。`foreignObject`
+元素可以在其内部使用具有其它`XML`命名空间的`XML`元素。即借助`foreignObject`标签，可以直接在`SVG`内部嵌入`XHTML`元素。`HTML`
+布局比`SVG text`元素更适合长文本。另一个常用的案例是用`MathML`写方程式。`foreignObject`是一个`SVG`
+元素，所以可以使用任何`SVG`的方法对其内容进行操作。
+
+**备注：`foreignObject`元素的内容是能被浏览器加工的。一个独立的`SVG`浏览器不太可能呈现`HTML`或`MathML`。**
 
 #### 3.4.7 文本
 
@@ -5021,6 +5014,170 @@ fill-rule = type
 `textPath`元素将文本放置在其内部，并通过`xlink:href`属性值引用`<path>`元素，就可以让文字块呈现在`<path>`元素给定的路径上了。
 
 详见`text.svg`文件。
+
+##### 3.4.7.4 SVG字体
+
+制定`SVG`时，并未在浏览器支持`Web`字体。访问字体文件让字体正确呈现是具有稳定性的。因此，通过字体描述技术实现`SVG`
+文字。而不是为了和其他（`PostScript`，`OTF`）格式兼容，仅是为了将字形信息嵌入`SVG`进行呈现。
+
+**备注：`SVG`字体当前只在`Safari`和`Android`浏览器中受支持。`Chrome 38`（`Opera 25`）移除了这个功能，`Firefox`
+已经无限期推迟实施它以专注于实现`WOFF`。`Batik`和部分`Inkscape`支持`SVG` 字体嵌入。**
+
+因为该功能已经移除，不做过多赘述。
+
+#### 3.4.8 基础变形
+
+利用`<g>`元素，可以把属性赋给一整个元素集合。这是`<g>`元素唯一的用途。
+
+##### 3.4.8.1 平移
+
+`translate(x,y)`能把元素移动一段距离，甚至你可以根据相应的属性定位它。如果没有指定`y`，则默认值为`0`。
+
+##### 3.4.8.2 旋转
+
+`rotate(a)`能把元素旋转`a`度。
+
+##### 3.4.8.3 斜切
+
+参考：https://juejin.cn/post/7145014612713766948
+
+`skewX(a)`，`skewY(b)`都可以将元素倾斜一定角度并按照斜切方向移动一定距离。不支持`skew(x,y)`。
+
+##### 3.4.8.4 缩放
+
+`scale(x,y)`可以改变元素的尺寸。`0.5`表示收缩到`50%`。如果`y`缺省，则默认赋值为`x`。
+
+##### 3.4.8.5 矩阵操作
+
+参考：https://www.cnblogs.com/bbcfive/p/11155824.html
+
+上述所有变形可以使用一个`2x3`的变形矩阵替代实现。使用`matrix(a, b, c, d, e, f)`设置变形矩阵。它将上一个坐标系统的坐标映射到新的坐标系统：
+
+x<sub>new</sub> = ax<sub>prev</sub> + cy<sub>prev</sub> + e
+
+y<sub>new</sub> = bx<sub>prev</sub> + dy<sub>prev</sub> + f
+
+详见`transform.svg`文件
+
+##### 3.4.8.6 坐标系统上的变形
+
+如果使用了变形，会在元素内部建立一个应用了这些变形的新坐标系统，你为该元素和它的子元素指定的单位可能不是`1:1`
+像素映射。但是依然会根据这个变形进行平移、旋转、斜切、缩放操作。
+
+```svg
+
+<g transform="scale(2)">
+  <rect width="50" height="50"/>
+</g>
+```
+
+##### 3.4.8.7 SVG嵌套变形
+
+`SVG`允许嵌入别的`<svg>`元素。可以利用内部`<svg>`元素的`viewBox`、`width`和`height`属性创建一个新的坐标系统。
+
+```svg
+
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <svg width="100" height="100" viewBox="0 0 50 50">
+    <rect width="50" height="50"/>
+  </svg>
+</svg>
+```
+
+#### 3.4.9 裁切和遮罩
+
+##### 3.4.9.1 裁切
+
+`clip-path`用于移除在其他元素的部分内容。不支持任何半透明效果，只能显示或不显示。
+
+**`clip-path`示例**
+
+```svg
+<!-- 经过裁切，得到一个四分之三圆 -->
+<svg version="1.1" baseProfile="full" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- <clipPath> 裁切元素通常定义在 <defs> 中 -->
+    <clipPath id="cut-off-bottom">
+      <!-- 用于确定画布填充范围，它并不会被绘制 -->
+      <rect x="0" y="0" width="200" height="150"/>
+    </clipPath>
+  </defs>
+  <rect width="100%" height="100%" fill="white"/>
+  <!-- clip-path 引用 <clipPath> 裁切元素 -->
+  <circle cx="100" cy="100" r="100" fill="red" clip-path="url(#cut-off-bottom)"/>
+</svg>
+```
+
+![3.4.16.png](assets/3.4/16.png)
+
+##### 3.4.9.2 遮罩
+
+`mask`用于实现具有透明度和灰度值遮罩的渐变边缘。
+
+**`mask`示例**
+
+```svg
+<!-- 遮罩可以实现元素淡出的效果 -->
+<svg version="1.1" baseProfile="full" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="Gradient">
+      <stop offset="0" stop-color="white" stop-opacity="0"/>
+      <stop offset="1" stop-color="white" stop-opacity="1"/>
+    </linearGradient>
+    <mask id="Mask">
+      <!-- 填充了一个透明到白色的渐变 -->
+      <rect x="0" y="0" width="200" height="200" fill="url(#Gradient)"/>
+    </mask>
+  </defs>
+  <rect x="0" y="0" width="200" height="200" fill="green"/>
+  <!-- mask 引用 <mask> 遮罩元素。红色矩形继承遮罩的 alpha 值（透明度） -->
+  <rect x="0" y="0" width="200" height="200" fill="red" mask="url(#Mask)"/>
+</svg>
+```
+
+![3.4.17.png](assets/3.4/17.png)
+
+##### 3.4.9.3 透明度
+
+可以用`opacity`为整个元素设置透明度。填充和描边分别有`fill-opacity`和`stroke-opacity`属性，用来控制填充和描边的不透明度。
+
+**注意：描边在填充的图层上面。如果在一个元素上设置了描边透明度，同时设有填充，则描边的一半应用填充色，另一半将应用背景色。**
+
+**`opacity`示例**
+
+```svg
+<!-- 红色的圆形在绿色的背景上，黄色描边设置为 50% 不透明度，达到双色描边的效果 -->
+<svg version="1.1" baseProfile="full" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="200" height="200" fill="green"/>
+  <circle cx="100" cy="100" r="50" stroke="yellow" stroke-width="40" stroke-opacity="0.5" fill="red"/>
+</svg>
+```
+
+![3.4.18.png](assets/3.4/18.png)
+
+#### 3.4.10 滤镜效果
+
+某些情况下，基本的`SVG`图形不能实现某种想要的效果。比如阴影效果不能通过渐变类元素实现。
+
+滤镜就是`SVG`用于创建复杂效果的一种机制。滤镜使用`<filter>`元素在`<defs>`中定义。`<filter>`元素提供一系列图元（`primitives`
+），以及在前一个基本变换操作上添加另一个操作。只需要为`SVG`元素设置`filter`属性即可应用所创建的滤镜效果。
+
+**滤镜示例**
+
+实现一个带光照效果的`SVG`的名牌。
+
+1. 创建图形阴影：设置`<feGaussianBlur>`中的`in`属性为`SourceAlpha`（源图像的透明度`alpha`通道），设置模糊度为`4`并把`result`
+   保存在了一个名为`blur`的缓冲区中。
+2. 设置阴影偏移：设置`<feOffset>`中的`in`属性为`blur`，即上一步保存`result`的缓冲区。然后设置相对坐标，向右偏移`4`
+   ，向下偏移`4`。最后把结果`result`保存到名为`offsetBlur`的缓冲区中。
+3. 设置光照效果：设置`<feSpecularLighting>`中的`in`属性为`blur`，将会生成一个光照效果，并将结果`result`保存在`specOut`中。
+4. 组合光照效果：设置`<feComposite>`中的`in`属性为`specOut`及`in2`属性为`SourceAlpha`，将`specOut`
+   的效果遮盖掉，使得最后的结果不会大于`SourceAlpha`（源图像），组合结果`result`保存到`specOut`。
+5. 组合光照效果：设置`<feComposite>`中的`in`属性为`SourceGraphic`及`in2`属性为`specOut`，使用`arithmetic`
+   组合模式，在`SourceGraphic`上添加`specOut`的效果，组合结果`result`保存到`litPaint`。
+6. 合并元素：使用`<feMerge>`元素合并了阴影效果`offsetBlur`和源图像的光照效果`litPaint`。
+
+详见`filter.svg`文件
 
 ## 4、VUE2相关
 
