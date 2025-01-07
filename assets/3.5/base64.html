@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Base64</title>
+</head>
+<body>
+<!DOCTYPE html>
+
+<script>
+    function base64ToBytes(base64) {
+        let binString = atob(base64);
+        return Uint8Array.from(binString, (m = 0) => m.codePointAt(0));
+    }
+
+    function bytesToBase64(bytes) {
+        const binString = Array.from(bytes, (byte) =>
+            String.fromCodePoint(byte),
+        ).join("");
+        console.log(binString)
+        return btoa(binString);
+    }
+
+    // 用法
+    const base64 = bytesToBase64(new TextEncoder().encode("a Ā 𐀀 文 🦄")); // "YSDEgCDwkICAIOaWhyDwn6aE"
+    const byte = new TextDecoder().decode(base64ToBytes("YSDEgCDwkICAIOaWhyDwn6aE")); // "a Ā 𐀀 文 🦄"
+    console.log(base64)
+    console.log(byte)
+
+
+    async function bytesToBase64DataUrl(bytes, type = "application/octet-stream") {
+        return await new Promise((resolve, reject) => {
+            const reader = Object.assign(new FileReader(), {
+                onload: () => resolve(reader.result),
+                onerror: () => reject(reader.error),
+            });
+            reader.readAsDataURL(new File([bytes], "", {type}));
+        });
+    }
+
+    async function dataUrlToBytes(dataUrl) {
+        const res = await fetch(dataUrl);
+        return new Uint8Array(await res.arrayBuffer());
+    }
+
+    // 用法
+    const base64DataUrl = bytesToBase64DataUrl(new Uint8Array([0, 1, 2])); // "data:application/octet-stream;base64,AAEC"
+    const byteData = dataUrlToBytes("data:application/octet-stream;base64,AAEC"); // Uint8Array [0, 1, 2]
+    console.log(base64DataUrl)
+    console.log(byteData)
+</script>
+</body>
+</html>

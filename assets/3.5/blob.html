@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Blob</title>
+    <style>
+    </style>
+</head>
+<body>
+<p>
+    此示例创建一个包含空格字符到字母 Z 的 ASCII
+    代码的类型化数组，然后将其转换为对象 URL。将创建一个用于打开该对象 URL
+    的链接。单击该链接可查看解码后的对象 URL。
+</p>
+
+<script type="text/javascript">
+    function showViewLiveResultButton() {
+        if (window.self !== window.top) {
+            // 确保如果我们的文档在 frame 中，我们会让用户首先在新的标签页或窗口中打开它。否则，此示例将不起作用。
+            const p = document.querySelector("p");
+            p.textContent = "";
+            const button = document.createElement("button");
+            button.textContent = "查看上面示例代码的渲染结果";
+            p.append(button);
+            button.addEventListener("click", () => window.open(location.href));
+            return true;
+        }
+        return false;
+    }
+
+    if (!showViewLiveResultButton()) {
+        function typedArrayToURL(typedArray, mimeType) {
+            return URL.createObjectURL(
+                new Blob([typedArray.buffer], {type: mimeType}),
+            );
+        }
+
+        const bytes = new Uint8Array(59);
+        for (let i = 0; i < 59; i++) {
+            bytes[i] = 32 + i;
+        }
+        console.log(bytes)
+
+        const url = typedArrayToURL(bytes, "text/plain");
+        const link = document.createElement("a");
+        link.href = url;
+        link.innerText = "打开这个数组的 URL";
+        document.body.appendChild(link);
+    }
+
+    const blob = new Blob(["Blob String"], {type: "text/plain"});
+
+    const reader = new FileReader();
+    reader.addEventListener("loadend", () => {
+        // reader.result 包含被转化为类型化数组的 blob 中的内容
+    });
+    // reader.readAsArrayBuffer(blob);
+    // 读取指定的 Blob 对象，并将文件内容读为 ArrayBuffer。
+    // reader.readAsBinaryString(blob);
+    // // 读取指定的 Blob 对象，并将文件内容读为二进制字符串。
+    // reader.readAsDataURL(blob);
+    // // 读取指定的 Blob 对象，并将文件内容读为 Data URL（Base64 编码的字符串）。
+    // reader.readAsText(blob);
+    // // 读取指定的 Blob 对象，并将文件内容读为文本字符串，默认使用 UTF-8 编码。
+
+    const text = new Response(blob).text();
+    // 将 Blob 中的内容读取为文本
+
+    const text2 = blob.text();
+    // 将 Blob 中的内容读取为文本
+
+    console.log(text, text2)
+</script>
+</body>
+</html>
+

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blob-demo</title>
+</head>
+<body>
+<!DOCTYPE html>
+<input type="file" id="fileInput" accept="image/*"/>
+<div id="imageContainer"></div>
+
+<script>
+    const fileInput = document.getElementById("fileInput");
+    const imageContainer = document.getElementById("imageContainer");
+    fileInput.addEventListener("change", function (event) {
+        // File 对象继承了 Blob 对象
+        const file = event.target.files[0];
+        if (file && file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = document.createElement("img");
+                img.src = e.target.result;
+                img.style.maxWidth = "500px";
+                img.style.margin = "10px";
+                imageContainer.innerHTML = "";
+                imageContainer.appendChild(img);
+            };
+            // 转成 base64
+            reader.readAsDataURL(file);
+        } else {
+            alert("请选择一个有效的图片文件。");
+        }
+    });
+</script>
+</body>
+</html>

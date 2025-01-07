@@ -5050,6 +5050,7 @@ https://developer.mozilla.org/zh-CN/docs/Web/MathML/Authoring
 ##### 3.4.8.5 矩阵操作
 
 参考：https://www.cnblogs.com/bbcfive/p/11155824.html
+https://www.cnblogs.com/fangsmile/p/9324194.html
 
 上述所有变形可以使用一个`2x3`的变形矩阵替代实现。使用`matrix(a, b, c, d, e, f)`设置变形矩阵。它将上一个坐标系统的坐标映射到新的坐标系统：
 
@@ -5178,6 +5179,445 @@ y<sub>new</sub> = bx<sub>prev</sub> + dy<sub>prev</sub> + f
 6. 合并元素：使用`<feMerge>`元素合并了阴影效果`offsetBlur`和源图像的光照效果`litPaint`。
 
 详见`filter.svg`文件
+
+### 3.5 Blob及File学习
+
+参考：https://juejin.cn/post/7424414729857400870
+
+#### 3.5.1 Blob对象
+
+`Blob`对象表示一个不可变、原始数据的类文件对象。它的数据可以按文本或二进制的格式进行读取，也可以转换成`ReadableStream`
+来用于数据操作。`Blob`提供了一种高效的方式来操作数据文件，而不需要将数据全部加载到内存中(比如流式读取、文件切片`slice()`
+方法)，这在处理大型文件或二进制数据时非常有用。
+
+`Blob`表示的不一定是`JavaScript`原生格式的数据。`File`接口基于`Blob`，继承了`Blob`的功能并将其扩展以支持用户系统上的文件。
+
+##### 3.5.1.1 语法
+
+要从其他非`Blob`对象和数据构造一个`Blob`，请使用`Blob()`构造函数。要创建一个`Blob`数据的子集`blob`，请使用`slice()`方法。
+
+```javascript
+new Blob(blobParts)
+new Blob(blobParts, options)
+// Blob() 构造函数返回一个新的 Blob 对象。blob 的内容由参数 blobParts 中给出的值串联而成。
+```
+
+* `blobParts`（可选）：一个可迭代对象，比如`Array`，包含`ArrayBuffer`、`TypedArray`、`DataView`、`Blob`
+  、字符串或者任意这些元素的组合，这些元素将会被放入`Blob`中。字符串应该是格式良好的`Unicode`，而单独代理项（`lone surrogate`
+  ）会使用和`String.prototype.toWellFormed()`相同的算法进行清理。
+* `options`（可选）：一个可以指定以下任意属性的对象：
+  * `type`（可选）：将会被存储到`Blob`中的数据的`MIME`类型。默认值是空字符（`""`）。
+  * `endings`（可选、非标准）：如果数据是文本，那么如何解释其中的换行符（`\n`）。默认值`transparent`会将换行符复制到`Blob`
+    中而不会改变它们。要将换行符转换为主机系统的本地约定，请指定值`native`。
+
+##### 3.5.1.2 属性
+
+```javascript
+Blob.size
+// 只读，Blob 对象中所包含数据的大小（字节）。
+Blob.type
+// 只读，一个字符串，表明该 Blob 对象所包含数据的 MIME 类型。如果类型未知，则该值为空字符串。
+```
+
+##### 3.5.1.3 实例方法
+
+```javascript
+Blob.arrayBuffer()
+// 返回一个 promise，其会兑现一个包含 Blob 所有内容的二进制格式的 ArrayBuffer。适合处理二进制数据。
+Blob.bytes()
+// 返回一个 promise，其会兑现一个包含 Blob 内容的 Uint8Array。
+Blob.slice(start, end)
+// 返回一个新的 Blob 对象，其中包含调用它的 Blob 的指定字节范围内的数据。
+Blob.stream()
+// 返回一个能读取 Blob 内容的 ReadableStream。允许你以流的方式处理数据，适合处理大文件。
+Blob.text()
+// 返回一个 promise，其会兑现一个包含 Blob 所有内容的 UTF-8 格式的字符串。
+```
+
+##### 3.5.1.4 使用场景
+
+**从Blob中提取数据**
+
+```javascript
+const reader = new FileReader();
+reader.addEventListener("loadend", () => {
+  // reader.result 包含被转化为类型化数组的 blob 中的内容
+});
+reader.readAsArrayBuffer(blob);
+// 读取指定的 Blob 对象，并将文件内容读为 ArrayBuffer。
+reader.readAsBinaryString(blob);
+// 读取指定的 Blob 对象，并将文件内容读为二进制字符串。
+reader.readAsDataURL(blob);
+// 读取指定的 Blob 对象，并将文件内容读为 Data URL（Base64 编码的字符串）。
+reader.readAsText(blob);
+// 读取指定的 Blob 对象，并将文件内容读为文本字符串，默认使用 UTF-8 编码。
+
+const text = new Response(blob).text();
+// 将 Blob 中的内容读取为文本
+
+const text = blob.text();
+// 将 Blob 中的内容读取为文本
+```
+
+**生成文件下载**
+
+```javascript
+// 可以通过 Blob 创建文件并生成下载链接供用户下载文件
+const blob = new Blob(["This is a test file."], {type: "text/plain"});
+const url = URL.createObjectURL(blob); // 创建一个 Blob URL
+const a = document.createElement("a");
+a.href = url;
+a.download = "test.txt";
+a.click();
+URL.revokeObjectURL(url); // 释放 URL 对象
+```
+
+**上传文件**
+
+```javascript
+// Blob 常用于上传文件到服务器，尤其是在使用 FormData API 时
+const formData = new FormData();
+// 做过上传文件功能的小伙伴，肯定都遇到过将 File 对象传入到 formData 中上传
+// 其实 File 对象就是继承了 Blob 对象，只不过加上了一些文件信息。
+formData.append("file", blob, "example.txt");
+
+fetch("/upload", {
+  method: "POST",
+  body: formData,
+}).then((response) => {
+  console.log("File uploaded successfully");
+});
+```
+
+**图像处理**
+
+通过`FileReader`可以将`Blob`对象读取为不同的数据格式。详见`blob-demo.html`文件。
+
+#### 3.5.2 File对象
+
+`File`提供有关文件的信息，允许`JavaScript`访问其内容。
+
+`File`继承自`Blob`对象，包含文件的元数据（如文件名、文件大小、类型等）。可以在`Blob`可使用的上下文中使用。
+
+`Blob`是纯粹的二进制数据，它可以存储任何类型的数据，但不具有文件的元数据（如文件名、最后修改时间等）。
+
+`File`是`Blob`的子类，除了继承`Blob`的所有属性和方法之外，还包含文件的元数据。你可以将`File`
+对象看作是带有文件信息的`Blob`。`Blob`更加通用，而`File`更专注于与文件系统的交互。
+
+##### 3.5.2.1 语法
+
+```javascript
+new File(fileBits, fileName)
+new File(fileBits, fileName, options)
+// File() 构造函数创建新的 File 对象实例。
+```
+
+* `fileBits`：一个可迭代对象，例如一个具有`ArrayBuffer`、`TypedArray`、`DataView`、`Blob`、字符串或任何此类元素的组合的数组，将被放入
+  `File`内。**注意：这里的字符串被编码为`UTF-8`，与通常的`JavaScript UTF-16`字符串不同。**
+* `fileName`：表示文件名或文件路径的字符串。
+* `options`（可选）：包含文件可选属性的选项对象。可用选项如下：
+  * `type`（可选）：表示将放入文件的内容的`MIME`类型的字符串。默认值为`""`。
+  * `endings`（可选）：如果数据是文本，那么如何解释其中的换行符（`\n`）。默认值`transparent`会将换行符复制到`Blob`
+    中而不会改变它们。要将换行符转换为主机系统的本地约定，请指定值`native`。
+  * `lastModified`（可选）：一个数字，表示`Unix`时间纪元与文件上次修改时间之间的毫秒数。默认值为调用`Date.now()`返回的值。
+
+##### 3.5.2.2 属性
+
+```javascript
+// File 接口还继承了 Blob 接口的属性。
+File.lastModified
+// 只读，返回文件的最后修改时间，以 UNIX 纪元（1970 年 1 月 1 日午夜）以来的毫秒为单位。
+File.lastModifiedDate
+// 已弃用 只读 非标准，返回 File 对象引用的文件的最后修改时间的 Date。
+File.name
+// 只读，返回 File 对象引用的文件的名称。
+File.webkitRelativePath
+// 只读，返回 File 对象相对于 URL 的路径。
+```
+
+##### 3.5.2.3 实例方法
+
+```javascript
+// File 接口还继承了 Blob 接口的方法。
+File.arrayBuffer()
+// 返回一个 promise，其会兑现一个包含 File 所有内容的二进制格式的 ArrayBuffer。适合处理二进制数据。
+File.bytes()
+// 返回一个 promise，其会兑现一个包含 File 内容的 Uint8Array。
+File.slice(start, end)
+// 返回一个新的 File 对象，其中包含调用它的 File 的指定字节范围内的数据。
+File.stream()
+// 返回一个能读取 File 内容的 ReadableStream。允许你以流的方式处理数据，适合处理大文件。
+File.text()
+// 返回一个 promise，其会兑现一个包含 File 所有内容的 UTF-8 格式的字符串。
+```
+
+##### 3.5.2.4 获取方式
+
+1. `File`对象通常从用户使用`<input>`元素选择文件返回的`FileList`对象中检索。
+2. 拖放操作返回的`DataTransfer`对象中检索。
+3. 使用`File`构造函数手动创建。
+
+```javascript
+<input type="file" id="fileInput"/>
+// 获取用户上传的
+document.getElementById("fileInput").addEventListener("change", (event) => {
+  const file = event.target.files[0];
+  console.log("文件名:", file.name, "文件类型:", file.type, "文件大小:", file.size);
+});
+
+// 手动创建 File
+const file = new File(["Hello, world!"], "hello-world.txt", {
+  type: "text/plain",
+});
+console.log(file);
+```
+
+##### 3.5.2.5 支持Blob和File对象的API
+
+以下`API`都接受`Blob`对象和`File`对象：
+
+1. `FileReader`
+2. `URL.createObjectURL() `
+3. `Window.createImageBitmap()`和`WorkerGlobalScope.createImageBitmap()`
+4. `fetch()`方法的`body`选项
+5. `XMLHttpRequest.send()`
+
+#### 3.5.3 FileReader对象
+
+`FileReader`接口允许`Web`应用程序异步读取存储在用户计算机上的文件（或原始数据缓冲区）的内容，使用`File`或`Blob`
+对象指定要读取的文件或数据。
+
+文件对象可以从用户使用`<input type="file">元素选择文件而返回的`FileList`对象中获取，或者从拖放操作的`DataTransfer`对象中获取。
+
+`FileReader`只能访问用户明确选择的文件内容（`input`或拖放）。它不能用于从用户的文件系统中按路径名读取文件。要按路径名读取客户端文件系统上的文件，请使用文件系统访问
+`API`。要读取服务器端文件，请使用`fetch()`，如果跨源读取，则需要`CORS`权限。
+
+##### 3.5.3.1 语法
+
+```javascript
+new FileReader()
+
+// FileReader() 构造函数创建一个新的 FileReader 对象。
+
+function printFile(file) {
+  // 使用 FileReader() 构造函数创建 FileReader 对象，和该对象的后续使用。
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    console.log(evt.target.result);
+  };
+  reader.readAsText(file);
+}
+```
+
+##### 3.5.3.2 属性
+
+```javascript
+FileReader.error
+// 只读，一个表示在读取文件时发生的错误的 DOMException。
+FileReader.readyState
+// 只读，表示FileReader状态的数字。取值如下：
+// 常量名	值	描述
+// EMPTY	0	还没有加载任何数据。
+// LOADING	1	数据正在被加载。
+// DONE	    2	已完成全部的读取请求。
+FileReader.result
+// 只读，文件的内容。该属性仅在读取操作完成后才有效，数据的格式取决于使用哪个方法来启动读取操作。
+```
+
+##### 3.5.3.3 实例方法
+
+```javascript
+FileReader.abort()
+// 中止读取操作。在返回时，readyState 属性为 DONE。
+FileReader.readAsArrayBuffer()
+// 开始读取指定的 Blob 中的内容，一旦完成，result 属性中将包含一个表示文件数据的 ArrayBuffer 对象。
+FileReader.readAsBinaryString()
+// 已弃用。开始读取指定的 Blob 中的内容。一旦完成，result 属性中将包含一个表示文件中的原始二进制数据的字符串。
+FileReader.readAsDataURL()
+// 开始读取指定的 Blob 中的内容。一旦完成，result 属性中将包含一个表示文件数据的 data: URL（Base64 编码的字符串）。
+FileReader.readAsText()
+// 开始读取指定的 Blob 中的内容。一旦完成，result 属性中将包含一个表示所读取的文件内容的字符串。可以指定可选的编码名称。
+```
+
+##### 3.5.3.4 事件
+
+使用`addEventListener()`方法或通过将事件侦听器分配给此接口的`oneventname`属性来侦听这些事件。一旦不再使用`FileReader`
+，请使用`removeEventListener()`删除事件侦听器，以避免内存泄漏。
+
+```javascript
+abort
+// 当读取被中止时触发，例如因为程序调用了 FileReader.abort() 方法。
+error
+// 当读取由于错误而失败时触发。
+load
+// 读取成功完成时触发。
+loadend
+// 读取完成时触发，无论成功与否（包括被中止）。
+loadstart
+// 读取开始时触发。
+progress
+// 读取数据时定期触发。
+```
+
+#### 3.5.4 Base64编码
+
+`Base64`是一种二进制到文本的编码规则，让二进制数据在解释成`64`进制的表现形式后能够用`ASCII`字符串的格式表示出来。`Base64`
+出自一种特定的`MIME`内容传输编码。常用于需要通过文本数据传输二进制数据的场景，例如在`URL`、电子邮件以及`JSON`数据中嵌入图像或文件。
+
+当单独使用术语`Base64`指代特定算法时，通常指的是`RFC 4648`第`4`节中概述的`Base64`版本。
+
+##### 3.5.4.1 Base64编码原理
+
+* 基本字符集：`Base64`使用`64`个可打印字符来表示二进制数据。这些字符包括：
+  * 大写字母`A-Z`（`26`个字符）
+  * 小写字母`a-z`（`26`个字符）
+  * 数字`0-9`（`10`个字符）
+  * 加号`+`和斜杠`/`（`2`个字符）
+* 数据分组：`Base64`将输入的二进制数据分成`24`位（`3`字节）一组，然后将这`24`位分为`4`个`6`位的块。每个`6`
+  位的块被转换为一个`Base64`字符。
+* 填充字符：如果原始数据的字节数不是`3`的倍数，`Base64`编码会在末尾添加一个或两个等号`=`作为填充，以确保输出字符数是`4`的倍数。
+
+**编码后大小增加：**
+
+每个`Base64`位代表`6`位数据。输入字符串/二进制文件的三个`8`位字节（`3×8 = 24`位）可以用四个`6`位`Base64`位（`4×6 = 24`
+位）表示。因此，字符串或文件的`Base64`版本通常比原来的内容多大约三分之一（受字符串的绝对长度、模`3`的余数、是否使用填充字符影响）。
+
+##### 3.5.4.2 Base64编码转换
+
+浏览器原生提供了两个`JavaScript`函数，用于解码和编码`Base64`字符串：
+
+`Window.btoa()`（在`worker`中可用）：从二进制数据字符串创建一个`Base64`编码的`ASCII`字符串（`btoa`应看作“从二进制到`ASCII`）
+`Window.atob()`（在`worker`中可用）：解码通过`Base64`编码的字符串数据（`atob`应看作“从`ASCII`到二进制）
+
+注意：`Base64`是一种二进制编码，而不是文本编码，但是在`Web`平台支持二进制数据类型之前，`btoa`和`atob`
+被添加到了其中。因此，这两个函数使用字符串来表示二进制数据，其中每个字符的码位表示每个字节的值。这导致了一个普遍的误解，即
+`btoa`可以用来编码任意文本数据，例如创建文本或`HTML`文档的`Base64 data: URL`。
+
+然而，字节到码位的对应关系只能可靠地适用于最高为`0x7f`的码位。此外，超过`0xff`的码位将导致`btoa`抛出错误，因为超过了`1`
+字节的最大值。
+
+**任意`Unicode`文本进行`Base64`编码解决方案**
+
+由于`btoa`将其输入字符串的码位解释为字节值，因此如果字符的码位超过`0xff`，调用`btoa`将导致`Character Out Of Range`
+异常。对于需要编码任意`Unicode`文本的用例，需要首先将字符串转换为其`UTF-8`的组成字节，然后再对这些字节进行编码。
+
+最简单的解决方案是使用`TextEncoder`和`TextDecoder`在`UTF-8`和字符串的单字节表示之间进行转换：
+
+```javascript
+function base64ToBytes(base64) {
+  const binString = atob(base64);
+  return Uint8Array.from(binString, (m) => m.codePointAt(0));
+}
+
+function bytesToBase64(bytes) {
+  const binString = Array.from(bytes, (byte) =>
+          String.fromCodePoint(byte),
+  ).join("");
+  return btoa(binString);
+}
+
+// 用法
+bytesToBase64(new TextEncoder().encode("a Ā 𐀀 文 🦄")); // "YSDEgCDwkICAIOaWhyDwn6aE"
+new TextDecoder().decode(base64ToBytes("YSDEgCDwkICAIOaWhyDwn6aE")); // "a Ā 𐀀 文 🦄"
+```
+
+`bytesToBase64`和`base64ToBytes`函数可以直接用于在`Base64`字符串和`Uint8Array`之间进行转换。
+
+为了获得更好的性能，可以通过`FileReader`和`fetch`进行基于`Base64`数据`URL`的异步转换：
+
+```javascript
+async function bytesToBase64DataUrl(bytes, type = "application/octet-stream") {
+  return await new Promise((resolve, reject) => {
+    const reader = Object.assign(new FileReader(), {
+      onload: () => resolve(reader.result),
+      onerror: () => reject(reader.error),
+    });
+    reader.readAsDataURL(new File([bytes], "", {type}));
+  });
+}
+
+async function dataUrlToBytes(dataUrl) {
+  const res = await fetch(dataUrl);
+  return new Uint8Array(await res.arrayBuffer());
+}
+
+// 用法
+await bytesToBase64DataUrl(new Uint8Array([0, 1, 2])); // "data:application/octet-stream;base64,AAEC"
+await dataUrlToBytes("data:application/octet-stream;base64,AAEC"); // Uint8Array [0, 1, 2]
+```
+
+#### 3.5.5 URL.createObjectURL()静态方法
+
+`URL`接口的`createObjectURL()`静态方法创建一个用于表示参数中给出的对象的`URL`的字符串。`URL`代表指定的`MediaSource`
+（基本被废弃）、`File`或`Blob`对象。允许开发者通过`URL`引用本地的文件或数据，而不需要将其上传到服务器。
+
+`URL`的生命周期与其创建时所在窗口的`document`绑定在一起，浏览器会在卸载文档时自动释放对象`URL`
+。但为了优化性能和内存使用，若在安全时间内可以明确卸载，就应该卸载，需要手动调用`revokeObjectURL()`。
+
+**注意：此特性在`Service Worker`中不可用，因为它有可能导致内存泄漏。**
+
+##### 3.5.4.1 语法
+
+要从其他非`Blob`对象和数据构造一个`Blob`，请使用`Blob()`构造函数。要创建一个`Blob`数据的子集`blob`，请使用`slice()`方法。
+
+```javascript
+URL.createObjectURL(object)
+// createObjectURL() 静态方法创建一个用于表示参数中给出的对象的 URL 的字符串。
+```
+
+* `object`：用于创建`URL`的`File`、`Blob`或`MediaSource`对象。
+
+##### 3.5.4.2 内存管理
+
+每次调用`createObjectURL()`时，都会创建一个新的对象`URL`，即使已经为同一个对象创建了一个`URL`
+。当不再需要这些对象时，必须通过调用`URL.revokeObjectURL()`来释放它们。
+
+浏览器会在卸载文档时自动释放对象`URL`；然而，为了优化性能和内存使用，如果在安全时间内可以明确卸载，就应该卸载。
+
+使用对象`URL`进行媒体流处理：在较早版本的媒体源规范中，需要为`MediaStream`创建一个对象`URL`才能将流附加到`<video>`
+元素。这已不再必要，浏览器正在逐步取消对此的支持。
+
+##### 3.5.5.3 使用场景
+
+* 预览文件：用户上传文件后，可以使用`createObjectURL()`生成一个`URL`来在浏览器中预览图像、视频或音频。
+* 动态生成内容：在不需要持久化存储的情况下，使用`Blob`对象动态生成内容并通过`URL`引用。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Preview</title>
+</head>
+<body>
+<h1>Upload and Preview Image</h1>
+<input type="file" id="fileInput" accept="image/*">
+<div id="preview" style="margin-top: 20px;">
+  <img id="imagePreview" src="" alt="Image Preview" style="max-width: 100%; display: none;">
+</div>
+
+<script>
+  document.getElementById('fileInput').addEventListener('change', function (event) {
+    const file = event.target.files[0];
+    if (!file) {
+      return;
+    }
+    // 生成一个 URL 用于引用文件
+    const imageUrl = URL.createObjectURL(file);
+    // 显示图像预览
+    const img = document.getElementById('imagePreview');
+    img.src = imageUrl;
+    img.style.display = 'block';
+
+    img.onload = function () {
+      URL.revokeObjectURL(imageUrl);
+    };
+  });
+</script>
+</body>
+</html>
+```
 
 ## 4、VUE2相关
 
