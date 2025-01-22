@@ -6513,6 +6513,204 @@ count.value++ // state.count 值改变为 1
 
 ![5.5.1.png](assets/5.5/1.png)
 
+### 5.6 useTemplateRef使用
+
+参考：https://juejin.cn/post/7410259203175088138
+
+#### 5.6.1 useTemplateRef是什么
+
+`Vue 3`中`DOM`和子组件可以使用`ref`进行模版引用。但`ref`存在有一些让人迷惑的地方。比如定义的`ref`到底是响应式数据还是`DOM`
+元素？还有`template`中`ref`属性的值明明是一个字符串，比如`ref="inputEl"`，怎么就和`script`中同名的`inputEl`
+变量绑到一块了呢？所以`Vue 3.5`推出了`useTemplateRef`函数，完美的解决了这些问题。
+
+#### 5.6.2 ref模版引用的问题
+
+`ref`属性接收的不是一个`ref`变量，而是`ref`变量的名称。
+
+```vue
+
+<template>
+  <div>
+    <!-- <input type="text" :ref="inputEl"/> -->
+    <!-- 上面的写法是错误的，但是并不会报错。因为 ref 属性接收的不是一个 ref 变量，而是 ref 变量的名称 -->
+    <input type="text" ref="inputEl"/>
+  </div>
+</template>
+
+<script setup>
+  import {ref} from "vue";
+
+  const inputEl = ref();
+</script>
+
+<style scoped>
+
+</style>
+```
+
+如果将`ref`模版引用相关的逻辑抽成`hooks`后，则需要在`vue`组件中定义`ref`属性对应的`ref`变量。
+
+```javascript
+// useInput.js
+import {ref} from "vue";
+
+export default function useRef() {
+  const inputEl = ref();
+
+  function setInputValue(text) {
+    if (inputEl.value) {
+      inputEl.value.value = text;
+    }
+  }
+
+  return {
+    inputEl,
+    setInputValue,
+  };
+}
+```
+
+虽然在`vue`组件中不会使用`inputEl`变量，但是还是需要从`hooks`中导入`useInput`变量。
+
+```vue
+
+<template>
+  <div>
+    <input type="text" ref="inputEl"/>
+    <button @click="setInputValue('123')">给input赋值</button>
+  </div>
+</template>
+
+<script setup>
+  import useInput from "./useInput.js";
+  // 如果不从 hooks 中导入 inputEl 变量，那么 inputEl 变量就不能绑定上 input 输入框了。
+  const {setInputValue, inputEl} = useInput();
+</script>
+
+<style scoped>
+
+</style>
+```
+
+#### 5.6.3 useTemplateRef函数
+
+`useTemplateRef`函数的用法：只接收一个字符串参数`key`。返回值是一个`ref`变量。其中参数`key`字符串的值应该等于`template`
+中`ref`属性的值。返回值是一个`ref`变量，变量的值指向模版引用的`DOM`元素或者子组件。
+
+```vue
+<!-- 将之前的示例改为使用 useTemplateRef 函数 -->
+<template>
+  <div>
+    <input type="text" ref="inputRef"/>
+    <button @click="setInputValue('123')">给input赋值</button>
+  </div>
+</template>
+
+<script setup>
+  import {useTemplateRef} from "vue";
+  // useTemplateRef 函数的返回值就是指向 input 输入框的 ref 变量
+  const inputEl = useTemplateRef("inputRef");
+
+  function setInputValue(text) {
+    if (inputEl.value) {
+      inputEl.value.value = text;
+    }
+  }
+</script>
+
+<style scoped>
+
+</style>
+```
+
+#### 5.6.4 hooks中使用useTemplateRef函数
+
+```javascript
+// useInput.js
+import {useTemplateRef} from "vue";
+
+export default function useRef(key) {
+  const inputEl = useTemplateRef(key);
+
+  function setInputValue(text) {
+    if (inputEl.value) {
+      inputEl.value.value = text;
+    }
+  }
+
+  return {
+    setInputValue,
+  };
+}
+```
+
+现在`hooks`中就不需要导出变量`inputEl`了，因为`inputEl`变量只在`hooks`内部使用。
+
+```vue
+
+<template>
+  <div>
+    <input type="text" ref="inputEl"/>
+    <button @click="setInputValue('123')">给input赋值</button>
+  </div>
+</template>
+
+<script setup>
+  import useInput from "./useInput.js";
+  // 此时只需要引入 setInputValue 函数即可
+  const {setInputValue} = useInput("inputEl");
+</script>
+
+<style scoped>
+
+</style>
+```
+
+#### 5.6.5 useTemplateRef源码
+
+```typescript
+import {type ShallowRef, readonly, shallowRef} from '@vue/reactivity'
+import {getCurrentInstance} from '../component'
+import {warn} from '../warning'
+import {EMPTY_OBJ} from '@vue/shared'
+
+export const knownTemplateRefs: WeakSet<ShallowRef> = new WeakSet()
+
+export function useTemplateRef<T = unknown, Keys extends string = string>(
+        key: Keys,
+): Readonly<ShallowRef<T | null>> {
+  const i = getCurrentInstance()
+  const r = shallowRef(null)
+  if (i) {
+    const refs = i.refs === EMPTY_OBJ ? (i.refs = {}) : i.refs
+    let desc: PropertyDescriptor | undefined
+    if (
+            __DEV__ &&
+            (desc = Object.getOwnPropertyDescriptor(refs, key)) &&
+            !desc.configurable
+    ) {
+      warn(`useTemplateRef('${key}') already exists.`)
+    } else {
+      Object.defineProperty(refs, key, {
+        enumerable: true,
+        get: () => r.value,
+        set: val => (r.value = val),
+      })
+    }
+  } else if (__DEV__) {
+    warn(
+            `useTemplateRef() is called when there is no active component ` +
+            `instance to be associated with.`,
+    )
+  }
+  const ret = __DEV__ ? readonly(r) : r
+  if (__DEV__) {
+    knownTemplateRefs.add(ret)
+  }
+  return ret
+}
+```
+
 ## 6、Git相关
 
 ## 7、GitHub相关
