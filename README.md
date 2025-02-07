@@ -188,7 +188,7 @@ window.onscroll = function () {
 <div id="top"></div>
 ```
 
-### 1.4.2 scrollTo函数
+#### 1.4.2 scrollTo函数
 
 控制滚动条回到指定位置，第一个参数是距离页面左端的距离，第二个参数是距离页面顶部的距离。
 
@@ -196,7 +196,7 @@ window.onscroll = function () {
 <a href="javascript:scrollTo(0, 0)">回到顶部</a>
 ```
 
-### 1.4.3 scrollTop函数
+#### 1.4.3 scrollTop函数
 
 控制滚动条垂直偏移。
 
@@ -210,7 +210,7 @@ function byScrollTop() {
 }
 ```
 
-### 1.4.4 scrollBy函数
+#### 1.4.4 scrollBy函数
 
 该方法可把内容滚动指定的像素数。第一个参数指向右滚动的像素，第二个参数指向下滚动的参数，负数可使方向相反。
 
@@ -223,7 +223,7 @@ function byScrollBy() {
 }
 ```
 
-### 1.4.4 间接回到顶部
+#### 1.4.4 间接回到顶部
 
 定时器实现滚动动画。通过定时器实现固定速度的自动滚动动画效果。但是这样会有个问题，就是当页面内容十分多的时候，这个时候离顶部已经有很长一段距离了。如果还是一个固定速度的话，可能会长达10秒钟，这对用户体验来说是不友好的。
 
@@ -963,6 +963,147 @@ box-sizing: border-box; 表示IE盒模型（怪异盒模型）
 const width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 const width = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 ```
+
+### 1.14 样式穿刺，深度选择器
+
+参考：https://juejin.cn/post/7413669480624357386
+https://segmentfault.com/a/1190000015932467
+
+在`Vue`项目中，尤其是在使用组件化开发时，有时需要对组件内部的某些样式进行调整，但`Vue`的样式封装特性`scoped`
+会阻止外部样式直接作用于组件内部。为了应对解决这个问题，`Vue`引入了深度选择器（也称为穿透选择器或阴影穿透选择器），让我们能够跨越组件的封装边界，对内部元素进行样式定制。
+
+深度选择器允许我们从父组件中穿透到子组件内部，直接修改子组件的样式。这在需要定制第三方`UI`库组件样式时尤为实用。
+
+`scoped`的实现原理
+
+`Vue`中的`scoped`属性的效果主要是通过`PostCss`实现的。以下是转译前的代码:
+
+```vue
+
+<style scoped lang="less">
+  .example {
+    color: red;
+  }
+</style>
+<template>
+  <div class="example">scoped测试案例</div>
+</template>
+```
+
+转译后:
+
+```vue
+
+<style>
+  .example[data-v-5558831a] {
+    color: red;
+  }
+</style>
+<template>
+  <div class="example" data-v-5558831a>scoped测试案例</div>
+</template>
+```
+
+`PostCSS`给一个组件中的所有dom添加了一个独一无二的动态属性，给`CSS`选择器额外添加一个对应的属性选择器，来选择组件中的`DOM`
+,这种做法使得样式只作用于含有该属性的`DOM`元素（组件内部的`DOM`）。
+
+`scoped`的渲染规则：
+给`HTML`的`DOM`节点添加一个不重复的`data`属性（例如：`data-v-5558831a`）来唯一标识这个`DOM`元素在每句`CSS`选择器的末尾（
+编译后生成的`CSS`语句）加一个当前组件的`data`属性选择器(例如：`[data-v-5558831a]`)来私有化样式
+
+#### 1.14.1 深度选择器种类
+
+##### 1.14.1.1 原生深度选择器
+
+`>>>`是`CSS`原生中的深度选择器语法，用于穿透样式封装。
+
+* 兼容性：仅在某些特定环境（如`Webpack`的`css-loader`配置中）和原生`CSS`中有效，`Vue`单文件组件中通常需要特定配置才能使用。
+* 注意：在`Vue`单文件组件中，我们通常会搭配`CSS`预处理器使用。但`Sass`之类的预处理器无法正确解析`>>>`，所以不推荐使用`>>>`
+  ，可以使用`/deep/`或`::v-deep`操作符取而代之，两者都是`>>>`的别名，同样可以正常工作。
+
+```css
+.parent >>> .child {
+  /* 样式规则 */
+}
+```
+
+##### 1.14.1.2 /deep/深度选择器
+
+`/deep/`曾经是`CSS`中实际提出的新增功能，但之后被删除，所以不建议使用。
+
+* 兼容性：支持`CSS`预处理器（如`Sass`、`Less`）和`CSS`原生样式。
+* 注意：在`Vue3`中，`/deep/`不再被官方直接支持，虽然一些构建工具或库可能仍然兼容，但不推荐使用，使用后编译时控制台会输出警告信息。
+
+```css
+.parent /deep/ .child {
+  /* 样式规则 */
+}
+```
+
+##### 1.14.1.3 ::v-deep深度选择器
+
+`::v-deep`是`/deep/`的别名深度选择器。
+
+* 兼容性：支持`Vue2`，但在`Vue3`中不推荐使用。
+* 注意：在`Vue3`中，`::v-deep`也不再被官方直接支持，虽然一些构建工具或库可能仍然兼容，但不推荐使用，使用后编译时控制台会输出警告信息。
+
+```css
+.parent /deep/ .child {
+  /* 样式规则 */
+}
+```
+
+##### 1.14.1.4 ::v-deep()深度选择器
+
+`::v-deep()`是深度选择器从`Vue2`向`Vue3`演化过程中的一个过渡性组合器。
+
+用法：支持`Vue3`，但编译时视为已弃用并会引发警告。
+
+```css
+.parent ::v-deep(.child) {
+  /* 样式规则 */
+}
+```
+
+##### 1.14.1.4 :deep()深度选择器
+
+`:deep()`是`Vue3`官方推荐的深度选择器，不建议使用`>>>`，`/deep/`，`::v-deep`及`::v-deep()`。
+
+* 兼容性：支持`Vue3`，但在`Vue2`中不可使用。
+* 文档：https://cn.vuejs.org/api/sfc-css-features#style-scoped
+
+```css
+.parent :deep(.child) {
+  /* 样式规则 */
+}
+```
+
+#### 1.14.2 演变过程
+
+参考：https://github.com/vuejs/rfcs/blob/scoped-styles-changes/active-rfcs/0023-scoped-styles-changes.md#deep-selectors
+
+最初我们支持`>>>`组合器，以使选择器“更深入”。但是，由于这不是官方的`CSS`组合器，因此某些`CSS`预处理器（如`SASS`）在解析它时会遇到问题。
+后来改用了`/deep/`，它曾是`CSS`中实际提出的新增功能（`Chrome`原生支持）但后来删除了。这给用户带来了困惑，因为他们担心`/deep/`
+在`Vue SFC`中使用会导致他们的代码在已删除该功能的浏览器中不受支持。但是，就像`>>>`一样，`/deep/`它仅被`Vue`的`SFC`
+编译器用作编译时提示来重写选择器，并在最终的`CSS`中被删除。
+
+为了避免因删除组合器而产生的混淆/deep/，我们引入了另一个自定义组合器，`::v-deep`这次更明确地表明这是一个特定于`Vue`
+的扩展，并使用伪元素语法，以便任何预处理器都应该能够解析它。出于兼容性原因，当前`Vue2 SFC`
+编译器仍支持深度组合器的先前版本，这又会让用户感到困惑。在`Vue3`中，我们不再支持`>>>`和`/deep/`。
+
+当我们在为`Vue3`开发新的`SFC`编译器时，我们注意到`CSS`伪元素实际上在语义上不是组合器。伪元素接受参数更符合惯用的`CSS`
+，因此我们也以`::v-deep()`这种方式进行工作。目前仍支持将作为组合器的`::v-deep`用法，但会视为已弃用并会引发警告。
+
+`>>>` → `/deep/` → `::v-deep` → `::v-deep()` → `:deep()`
+
+可以明显看到深度选择器的演化趋势：**关系选择器 → 伪元素 → 伪类**
+
+#### 1.14.3 使用场景
+
+1. 在`Vue2`中使用`::v-deep`。
+2. 在`Vue3`中使用`:deep()`。
+3. `/deep/`需要与特定浏览器版本搭配使用，不推荐使用。
+4. 部分`CSS`预处理器对`>>>`支持不佳，在不使用`CSS`预处理器时可使用，否则不推荐使用。
 
 ## 2、JavaScript相关
 
@@ -6521,7 +6662,7 @@ count.value++ // state.count 值改变为 1
 
 `Vue 3`中`DOM`和子组件可以使用`ref`进行模版引用。但`ref`存在有一些让人迷惑的地方。比如定义的`ref`到底是响应式数据还是`DOM`
 元素？还有`template`中`ref`属性的值明明是一个字符串，比如`ref="inputEl"`，怎么就和`script`中同名的`inputEl`
-变量绑到一块了呢？所以`Vue 3.5`推出了`useTemplateRef`函数，完美的解决了这些问题。
+变量绑到一块了呢？所以`Vue 3.5`推出了`useTemplateRef`函数，完美地解决了这些问题。
 
 #### 5.6.2 ref模版引用的问题
 
@@ -6718,6 +6859,77 @@ export function useTemplateRef<T = unknown, Keys extends string = string>(
 ## 8、NPM相关
 
 ## 9、项目相关
+
+### 9.1 更新打包后文件内容
+
+在使用一些插件进行打包时，可能会出现文件路径错误的问题。有一些情况可以通过打包工具或插件配置进行调整。但也有一些情况只能通过手动修改。以下介绍的是手动修改的方案。
+
+思路为在打包后手动触发更新文件。更新文件的逻辑为根据打包后的文件路径对文件进行读取并使用正则匹配定位并进行内容修改。
+
+以下示例为使用`updateHtml.js`文件对打包后的`index.html`文件中`id`为`vite-legacy-polyfill`和`vite-legacy-entry`的`script`
+分别进行`src`和`data-src`调整。
+
+`package.json`文件中的`build tools`添加`node tool/updateHtml.js`手动触发更新文件。
+
+```json
+// package.json 文件
+{
+  "name": "demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev tools": "vite",
+    "build tools": "vite build --config build.js & node tool/updateHtml.js"
+  },
+  "dependencies": {
+    "@vitejs/plugin-legacy": "^6.0.0",
+    "axios": "^1.6.7",
+    "crypto-js": "^4.2.0",
+    "pinia": "^2.1.7",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
+  }
+}
+```
+
+`updateHtml.js`文件中对`index.html`文件内容进行替换。
+
+```javascript
+// updateHtml.js 文件
+import fs from 'fs';
+
+// 打包后的 HTML 文件路径
+const htmlPath = './dist/index.html';
+const prefix = '/ofd/business'; // 替换为你的前缀
+
+// 读取 HTML 文件内容
+const htmlText = fs.readFileSync(htmlPath, 'utf8');
+
+// 定义正则表达式，匹配 id 为 vite-legacy-polyfill 或 vite-legacy-entry 的 script 标签
+const regex = /<script[^>]+id=["'](?:vite-legacy-polyfill|vite-legacy-entry)["'][^>]*>/g;
+
+// 替换匹配到的 script 标签的 src 和 data-src 属性
+const updatedHtml = htmlText.replace(regex, (match) => {
+  // 匹配并替换 data-src 属性
+  const dataSrcMatch = match.match(/data-src=["']([^"']+)["']/);
+  if (dataSrcMatch) {
+    match = match.replace(dataSrcMatch[1], `${prefix}/${dataSrcMatch[1]}`);
+  } else {
+    // 匹配并替换 src 属性
+    const srcMatch = match.match(/src=["']([^"']+)["']/);
+    if (srcMatch) {
+      match = match.replace(srcMatch[1], `${prefix}/${srcMatch[1]}`);
+    }
+  }
+  return match;
+});
+
+// 将修改后的内容写回 HTML 文件
+fs.writeFileSync(htmlPath, updatedHtml, 'utf8');
+
+console.log('HTML 文件已更新');
+```
 
 ## 10、性能优化相关
 
