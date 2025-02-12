@@ -1,7 +1,3 @@
-# myNote
-
-## 实用工具
-
 ## 1、CSS相关
 
 ### 1.1 实现淡入淡出、透明度、过度
@@ -7216,28 +7212,28 @@ VITE_KEY = 123;
 `.env`文件：
 
 ```env
-# 网站标题
+// 网站标题
 VITE_GLOB_APP_TITLE = clean Admin
 
-# 在本地打开时的端口号
+// 在本地打开时的端口号
 VITE_PROT = 8888
 ```
 
 `.env.development`文件：
 
 ```env
-# 本地环境
+// 本地环境
 
-# API 请求URL
+// API 请求URL
 VITE_API_URL = ""
 ```
 
 `.env.production`文件：
 
 ```env
-# 生产环境
+// 生产环境
 
-# API 请求URL
+// API 请求URL
 VITE_API_URL = ""
 ```
 
@@ -7592,3 +7588,6 @@ export default defineConfig(() => {
   }
 });
 ```
+
+## 15、实用工具
+
