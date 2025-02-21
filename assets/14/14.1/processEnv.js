@@ -6,13 +6,13 @@
 export const processEnv = (env) => {
     const metaEnv = {};
     for (const key in env) {
-        const wrapValue = env[key].trim().replace(/\\n/g, '\n');
+        const wrapValue = env[key].trim().replace(/\\n/g, "\n");
         metaEnv[key] = env[key];
 
-        if (wrapValue === 'true' || wrapValue === 'false') {
-            metaEnv[key] = wrapValue === 'true';
+        if (wrapValue === "true" || wrapValue === "false") {
+            metaEnv[key] = wrapValue === "true";
         }
-        if (!isNaN(Number(wrapValue)) && wrapValue !== '') {
+        if (!isNaN(Number(wrapValue)) && wrapValue !== "") {
             metaEnv[key] = Number(wrapValue);
         }
     }

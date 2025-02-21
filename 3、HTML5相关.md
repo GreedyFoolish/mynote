@@ -198,7 +198,7 @@ IntersectionObserver.unobserve()
 * `target`：与根出现相交区域改变的元素
 * `time`：可见性发生变化的时间，是一个高精度时间戳，单位为毫秒
 
-![3.2.1.png](assets/3.2/1.png)
+![3.2.1.png](assets/3/3.2/1.png)
 
 上图中，灰色的水平方框代表视口，深红色的区域代表四个被观察的目标元素。它们各自的`intersectionRatio`图中都已经注明。
 
@@ -311,7 +311,7 @@ if (canvas.getContext) {
 
 #### 3.3.2.1 栅格（canvas grid）
 
-![3.3.1.png](assets/3.3/1.png)
+![3.3.1.png](assets/3/3.3/1.png)
 
 如上图所示，`canvas`元素默认被网格所覆盖。网格中的一个单元相当于`canvas`
 元素中的一像素。栅格的起点为左上角（坐标为（0,0））。蓝色方形左上角距离左边（X轴）x像素，距离上边（Y轴）y像素（坐标为（x,y））。
@@ -349,7 +349,7 @@ function draw() {
 }
 ```
 
-![3.3.2.png](assets/3.3/2.png)
+![3.3.2.png](assets/3/3.3/2.png)
 
 #### 3.3.2.3 绘制路径
 
@@ -409,7 +409,7 @@ function draw() {
 }
 ```
 
-![3.3.3.png](assets/3.3/3.png)
+![3.3.3.png](assets/3/3.3/3.png)
 
 ##### 3.3.2.3.2 移动笔触
 
@@ -446,7 +446,7 @@ function draw() {
 }
 ```
 
-![3.3.4.png](assets/3.3/4.png)
+![3.3.4.png](assets/3/3.3/4.png)
 
 ##### 3.3.2.3.3 线
 
@@ -485,7 +485,7 @@ function draw() {
 **注意：因为路径使用填充`fill`时，路径自动闭合。而使用描边`stroke`不会闭合路径。如果不使用`closePath()`
 闭合路径，则只绘制了两条线段，并不是一个完整的三角形。**
 
-![3.3.5.png](assets/3.3/5.png)
+![3.3.5.png](assets/3/3.3/5.png)
 
 ##### 3.3.2.3.4 圆弧
 
@@ -531,7 +531,7 @@ function draw() {
 }
 ```
 
-![3.3.6.png](assets/3.3/6.png)
+![3.3.6.png](assets/3/3.3/6.png)
 
 ##### 3.3.2.3.5 二次贝塞尔曲线及三次贝塞尔曲线
 
@@ -546,7 +546,7 @@ bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y)
 
 下图能够很好地描述两者的关系，二次贝塞尔曲线有一个开始点（蓝色）、一个结束点（蓝色）以及一个控制点（红色），而三次贝塞尔曲线有两个控制点。
 
-![3.3.7.png](assets/3.3/7.png)
+![3.3.7.png](assets/3/3.3/7.png)
 
 参数x、y在这两个方法中都是结束点坐标。cp1x,cp1y为坐标中的第一个控制点，cp2x,cp2y为坐标中的第二个控制点。
 
@@ -573,7 +573,7 @@ function draw() {
 }
 ```
 
-![3.3.8.png](assets/3.3/8.png)
+![3.3.8.png](assets/3/3.3/8.png)
 
 ```javascript
 // 使用三次贝塞尔曲线绘制心形。
@@ -595,7 +595,7 @@ function draw() {
 }
 ```
 
-![3.3.9.png](assets/3.3/9.png)
+![3.3.9.png](assets/3/3.3/9.png)
 
 ##### 3.3.2.3.6 矩形
 
@@ -699,7 +699,7 @@ function draw() {
 }
 ```
 
-![3.3.10.png](assets/3.3/10.png)
+![3.3.10.png](assets/3/3.3/10.png)
 
 #### 3.3.2.4 Path2D对象
 
@@ -744,7 +744,7 @@ function draw() {
 }
 ```
 
-![3.3.11.png](assets/3.3/11.png)
+![3.3.11.png](assets/3/3.3/11.png)
 
 使用`SVG paths`
 
@@ -760,7 +760,7 @@ const p = new Path2D("M10 10 h 80 v 80 h -80 Z");
 ctx.fill(p);
 ```
 
-![3.3.12.png](assets/3.3/12.png)
+![3.3.12.png](assets/3/3.3/12.png)
 
 ### 3.3.3 应用样式和色彩
 
@@ -818,7 +818,7 @@ function draw() {
 }
 ```
 
-![3.3.14.png](assets/3.3/14.png)
+![3.3.14.png](assets/3/3.3/14.png)
 
 #### 3.3.3.2 透明度
 
@@ -865,7 +865,7 @@ function draw() {
 }
 ```
 
-![3.3.15.png](assets/3.3/15.png)
+![3.3.15.png](assets/3/3.3/15.png)
 
 **`rgba`示例**
 
@@ -891,7 +891,7 @@ function draw() {
 }
 ```
 
-![3.3.15.png](assets/3.3/15.png)
+![3.3.15.png](assets/3/3.3/15.png)
 
 #### 3.3.3.3 线型
 
@@ -936,7 +936,7 @@ function draw() {
 }
 ```
 
-![3.3.17.png](assets/3.3/17.png)
+![3.3.17.png](assets/3/3.3/17.png)
 
 **想要获得精确的线条，必须对线条是如何描绘出来的有所理解。**
 
@@ -950,7 +950,7 @@ function draw() {
 要解决这个问题，必须对路径施加更精确地控制。已知宽为`1.0`的线条会在路径两边各延伸半像素，按图三的方式绘制从`(3.5,1)`
 到`(3.5,5)`，宽为`1.0`的线条，其边缘正好落在像素边界，填充出来就是准确的宽为`1.0`的线条。
 
-![3.3.18.png](assets/3.3/18.png)
+![3.3.18.png](assets/3/3.3/18.png)
 
 **备注： 图三中，其`Y`坐标刚好落在网格线上。若非如此则会出现渲染半个像素的情况（注意：这种现象受到当前`lineCap`（默认为`butt`
 ）的影响；将`lineCap`设置为`square`，可以得到宽为奇数宽度一半像素的笔画；因此，端点的外轮廓会自动延伸并完全覆盖整个像素格）。**
@@ -998,7 +998,7 @@ function draw() {
 }
 ```
 
-![3.3.19.png](assets/3.3/19.png)
+![3.3.19.png](assets/3/3.3/19.png)
 
 **`lineJoin`示例**
 
@@ -1026,7 +1026,7 @@ function draw() {
 }
 ```
 
-![3.3.20.png](assets/3.3/20.png)
+![3.3.20.png](assets/3/3.3/20.png)
 
 **`miterLimit`示例**
 
@@ -1046,7 +1046,7 @@ function draw() {
 * `1.0` 是合法的斜接限定值，但这会去除所有斜接。
 * 小于`1.0`的值不是合法的斜接限定值。
 
-![3.3.21.png](assets/3.3/21.png)
+![3.3.21.png](assets/3/3.3/21.png)
 
 ```javascript
 // 仅包含javascript代码，详见line.html文件
@@ -1083,7 +1083,7 @@ function draw() {
 时，图形可见部分的边角不会延伸相交，而是在蓝色线条边呈现斜边连接效果；当`miterLimit`的值大于
 `10.0` 时，此例中大部分的边角都会在远离蓝线的位置相交，且从左至右，距离随着夹角的增大而减小；而介于上述值之间的值所呈现的效果，也介于两者之间。
 
-![3.3.22.png](assets/3.3/22.png)
+![3.3.22.png](assets/3/3.3/22.png)
 
 **虚线示例**
 
@@ -1115,7 +1115,7 @@ function march() {
 march();
 ```
 
-![3.3.23.png](assets/3.3/23.png)
+![3.3.23.png](assets/3/3.3/23.png)
 
 #### 3.3.3.4 渐变
 
@@ -1172,7 +1172,7 @@ function draw() {
 }
 ```
 
-![3.3.24.png](assets/3.3/24.png)
+![3.3.24.png](assets/3/3.3/24.png)
 
 **`createRadialGradient`示例**
 
@@ -1210,7 +1210,7 @@ function draw() {
 }
 ```
 
-![3.3.25.png](assets/3.3/25.png)
+![3.3.25.png](assets/3/3.3/25.png)
 
 #### 3.3.3.5 图案样式（Patterns）
 
@@ -1266,7 +1266,7 @@ shadowColor = color
 ```javascript
 ```
 
-![3.3.2.png](assets/3.3/2.png)
+![3.3.2.png](assets/3/3.3/2.png)
 
 **``示例**
 
@@ -1283,7 +1283,7 @@ function draw() {
 }
 ```
 
-![3.3.26.png](assets/3.3/26.png)
+![3.3.26.png](assets/3/3.3/26.png)
 
 #### 3.3.3.7 Canvas填充规则
 
@@ -1310,7 +1310,7 @@ function draw() {
 }
 ```
 
-![3.3.27.png](assets/3.3/27.png)
+![3.3.27.png](assets/3/3.3/27.png)
 
 ### 3.3.4 绘制文本
 
@@ -1335,7 +1335,7 @@ function draw() {
 }
 ```
 
-![3.3.28.png](assets/3.3/28.png)
+![3.3.28.png](assets/3/3.3/28.png)
 
 **文本边框示例**
 
@@ -1347,7 +1347,7 @@ function draw() {
 }
 ```
 
-![3.3.29.png](assets/3.3/29.png)
+![3.3.29.png](assets/3/3.3/29.png)
 
 #### 3.3.4.2 有样式的文本
 
@@ -1364,7 +1364,7 @@ direction = value
 
 下图展示了`textBaseline`属性支持的不同基线的情况：
 
-![3.3.30.png](assets/3.3/30.png)
+![3.3.30.png](assets/3/3.3/30.png)
 
 **`textBaseline`示例**
 
@@ -1375,7 +1375,7 @@ ctx.textBaseline = "hanging";
 ctx.strokeText("Hello world", 0, 100);
 ```
 
-![3.3.31.png](assets/3.3/31.png)
+![3.3.31.png](assets/3/3.3/31.png)
 
 #### 3.3.4.3 预测量文本宽度
 
@@ -1564,7 +1564,7 @@ function draw() {
 draw();
 ```
 
-![3.3.32.png](assets/3.3/32.png)
+![3.3.32.png](assets/3/3.3/32.png)
 
 #### 3.3.5.4 切片
 
@@ -1576,7 +1576,7 @@ drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
 // 新的 8 个参数参考下图图解，前 4 个是定义图片源的切片位置和大小，后 4 个则是定义切片的目标显示位置和大小。
 ```
 
-![3.3.33.png](assets/3.3/33.png)
+![3.3.33.png](assets/3/3.3/33.png)
 
 切片是个做图像合成的强大工具。假设有一张包含了所有元素的图像，那么你可以用这个方法来合成一个完整图像。例如，你想画一张图表，而手上有一个包含所有必需的文字的
 `PNG`文件，那么你可以根据实际数据的需要来改变最终显示的图表。**这方法的另一个好处就是你不需要单独装载每一个图像。**
@@ -1599,7 +1599,7 @@ async function draw() {
 draw();
 ```
 
-![3.3.34.png](assets/3.3/34.png)
+![3.3.34.png](assets/3/3.3/34.png)
 
 #### 3.3.5.5 画廊示例
 
@@ -1650,7 +1650,7 @@ async function draw() {
 draw();
 ```
 
-![3.3.5.png](assets/3.3/35.png)
+![3.3.5.png](assets/3/3.3/35.png)
 
 #### 3.3.5.6 控制图像的缩放行为
 
@@ -1710,7 +1710,7 @@ function draw() {
 }
 ```
 
-![3.3.36.png](assets/3.3/36.png)
+![3.3.36.png](assets/3/3.3/36.png)
 
 #### 3.3.6.2 移动
 
@@ -1721,7 +1721,7 @@ translate(x, y)
 // translate 方法接受两个参数。 x 是左右偏移量，y 是上下偏移量，如下图所示。
 ```
 
-![3.3.37.png](assets/3.3/37.png)
+![3.3.37.png](assets/3/3.3/37.png)
 
 大多数情况下，调用`restore`方法比手动恢复原先的状态要简单得多。如果在循环中做位移但没有保存和恢复`canvas`
 的状态，很可能会出现某些`canvas`元素没有渲染的情况，因为它很可能已经超出`canvas`范围以外了。
@@ -1743,7 +1743,7 @@ function draw() {
 }
 ```
 
-![3.3.38.png](assets/3.3/38.png)
+![3.3.38.png](assets/3/3.3/38.png)
 
 #### 3.3.6.3 旋转
 
@@ -1754,7 +1754,7 @@ rotate(angle)
 // rotate 方法接受一个参数：旋转的角度 angle，它是顺时针方向的，以弧度为单位的值。
 ```
 
-![3.3.39.png](assets/3.3/39.png)
+![3.3.39.png](assets/3/3.3/39.png)
 
 **注意：旋转的中心点始终是`canvas`的原点。如果要改变它，我们需要用到`translate`方法。**
 
@@ -1788,7 +1788,7 @@ function draw() {
 }
 ```
 
-![3.3.40.png](assets/3.3/40.png)
+![3.3.40.png](assets/3/3.3/40.png)
 
 #### 3.3.6.4 缩放
 
@@ -1823,7 +1823,7 @@ function draw() {
 }
 ```
 
-![3.3.41.png](assets/3.3/41.png)
+![3.3.41.png](assets/3/3.3/41.png)
 
 #### 3.3.6.5 变形
 
@@ -1876,7 +1876,7 @@ function draw() {
 }
 ```
 
-![3.3.42.png](assets/3.3/42.png)
+![3.3.42.png](assets/3/3.3/42.png)
 
 ### 3.3.7 合成（Compositing）
 
@@ -1932,13 +1932,13 @@ ctx.fillStyle = "red";
 ctx.fillRect(50, 50, 100, 100);
 ```
 
-![3.3.43.png](assets/3.3/43.png)
+![3.3.43.png](assets/3/3.3/43.png)
 
 #### 3.3.7.2 裁切路径
 
 裁切路径和普通的`canvas`图形差不多，不同的是它的作用是遮罩，用来隐藏不需要的部分。如下图所示，红边五角星就是裁切路径，所有路径外的部分都不会绘制出来。
 
-![3.3.44.png](assets/3.3/44.png)
+![3.3.44.png](assets/3/3.3/44.png)
 
 裁切路径可以实现与`globalCompositeOperation`属性`source-in`和`source-atop`类似的效果。
 **最重要的区别是裁切路径不会在`canvas`上绘制东西，而且它永远不受新图形的影响。**
@@ -1993,7 +1993,7 @@ function drawStar(ctx, r) {
 }
 ```
 
-![3.3.45.png](assets/3.3/45.png)
+![3.3.45.png](assets/3/3.3/45.png)
 
 ### 3.3.8 基本动画
 
@@ -2501,7 +2501,7 @@ const ctx = canvas.getContext("2d", {alpha: false});
 `SVG`是一种`XML`语言，类似`XHTML`，可以用来绘制如下图所示的矢量图形。`SVG`
 可以定义线和形状来创建图形，也可以修改已有的位图，或结合两种方式来创建图形。可以对图形和其组成部分进行变形、合成、滤镜方式来改变外观。
 
-![3.4.1png](assets/3.4/1.png)
+![3.4.1png](assets/3/3.4/1.png)
 
 `SVG`诞生于`1999`年，之前有几个相互竞争的格式规范提交到了`W3C`，但都没有获得批准。主流浏览器均支持`SVG`。加载慢是`SVG`
 的一个缺点。但`SVG`也有自身的优点，比如它实现了`DOM`接口（比`Canvas`方便），不需要安装第三方扩展。
@@ -2565,9 +2565,9 @@ const ctx = canvas.getContext("2d", {alpha: false});
 
 ```html
 <!-- 使用 object 元素引用 SVG 文件 -->
-<object data="./assets/3.4/demo.svg" type="image/svg+xml"></object>
+<object data="assets/3/3.4/demo.svg" type="image/svg+xml"></object>
 <!-- 使用 iframe 元素引用 SVG 文件 -->
-<iframe src="./assets/3.4/demo.svg"></iframe>
+<iframe src="assets/3/3.4/demo.svg"></iframe>
 ```
 
 #### 3.4.1.6 SVG文件类型
@@ -2616,7 +2616,7 @@ Vary: Accept-Encoding
 `SVG`使用的坐标系统/网格系统和`Canvas`用的差不多（所有计算机绘图都差不多）。坐标系统以页面的左上角为`(0,0)`
 坐标点，坐标以像素为单位，`x`轴正方向是向右，`y`轴正方向是向下。如下图所示，蓝色方形左上角坐标为`(x,y)`。
 
-![3.4.2.png](assets/3.4/2.png)
+![3.4.2.png](assets/3/3.4/2.png)
 
 **矩形示例**
 
@@ -2881,7 +2881,7 @@ c dx1 dy1, dx2 dy2, dx dy
 </svg>
 ```
 
-![3.4.3.png](assets/3.4/3.png)
+![3.4.3.png](assets/3/3.4/3.png)
 
 使用`S`命令创建的三次贝塞尔曲线，它的第一控制点默认为第二控制点的轴对称点（保持斜率不变）。
 
@@ -2903,7 +2903,7 @@ s dx2 dy2, dx dy
 </svg>
 ```
 
-![3.4.4.png](assets/3.4/4.png)
+![3.4.4.png](assets/3/3.4/4.png)
 
 ##### 3.4.3.2.2 二次贝塞尔曲线命令
 
@@ -2925,7 +2925,7 @@ q dx1 dy1, dx dy
 </svg>
 ```
 
-![3.4.5.png](assets/3.4/5.png)
+![3.4.5.png](assets/3/3.4/5.png)
 
 如果`T`命令跟在`Q`或`T`命令后面，则会将前命令控制点的中心对称点被作为它的控制点。如果`T`命令单独使用，前面没有`Q`或`T`
 命令，那么控制点就会被认为和终点是同一个点，所以画出来的将是一条直线。
@@ -2945,7 +2945,7 @@ q dx1 dy1, dx dy
 </svg>
 ```
 
-![3.4.6.png](assets/3.4/6.png)
+![3.4.6.png](assets/3/3.4/6.png)
 
 ##### 3.4.3.2.3 弧形命令
 
@@ -2986,7 +2986,7 @@ a rx ry x-axis-rotation large-arc-flag sweep-flag dx dy
 </svg>
 ```
 
-![3.4.7.png](assets/3.4/7.png)
+![3.4.7.png](assets/3/3.4/7.png)
 
 ```svg
 <!-- 上图没有旋转的椭圆，因为两点连线（即对角线）穿过了椭圆的中心，所以只有 2 种弧形可以选择。如下图所示为一般情况，会有两个椭圆，4 种弧。 -->
@@ -3005,7 +3005,7 @@ a rx ry x-axis-rotation large-arc-flag sweep-flag dx dy
 </svg>
 ```
 
-![3.4.8.png](assets/3.4/8.png)
+![3.4.8.png](assets/3/3.4/8.png)
 
 **`large-arc-flag`和`sweep-flag`示例**
 
@@ -3032,7 +3032,7 @@ a rx ry x-axis-rotation large-arc-flag sweep-flag dx dy
 </svg>
 ```
 
-![3.4.9.png](assets/3.4/9.png)
+![3.4.9.png](assets/3/3.4/9.png)
 
 ### 3.4.4 填充和描边
 
@@ -3097,7 +3097,7 @@ fill-rule = type
 </svg>
 ```
 
-![3.4.10.png](assets/3.4/10.png)
+![3.4.10.png](assets/3/3.4/10.png)
 
 **`stroke-linejoin`示例**
 
@@ -3123,7 +3123,7 @@ fill-rule = type
 </svg>
 ```
 
-![3.4.11.png](assets/3.4/11.png)
+![3.4.11.png](assets/3/3.4/11.png)
 
 **`stroke-miterlimit`注意事项**
 
@@ -3161,7 +3161,7 @@ fill-rule = type
 </svg>
 ```
 
-![3.4.12.png](assets/3.4/12.png)
+![3.4.12.png](assets/3/3.4/12.png)
 
 **`fill-rule`示例**
 
@@ -3211,7 +3211,7 @@ fill-rule = type
 </svg>
 ```
 
-![3.4.13.png](assets/3.4/13.png)
+![3.4.13.png](assets/3/3.4/13.png)
 **`evenodd`示例**
 
 ```svg
@@ -3245,7 +3245,7 @@ fill-rule = type
 </svg>
 ```
 
-![3.4.14.png](assets/3.4/14.png)
+![3.4.14.png](assets/3/3.4/14.png)
 
 #### 3.4.4.3 使用CSS设置样式
 
@@ -3282,7 +3282,7 @@ fill-rule = type
 </svg>
 ```
 
-![3.4.15.png](assets/3.4/15.png)
+![3.4.15.png](assets/3/3.4/15.png)
 
 ### 3.4.5 渐变
 
@@ -3519,7 +3519,7 @@ y<sub>new</sub> = bx<sub>prev</sub> + dy<sub>prev</sub> + f
 </svg>
 ```
 
-![3.4.16.png](assets/3.4/16.png)
+![3.4.16.png](assets/3/3.4/16.png)
 
 #### 3.4.9.2 遮罩
 
@@ -3546,7 +3546,7 @@ y<sub>new</sub> = bx<sub>prev</sub> + dy<sub>prev</sub> + f
 </svg>
 ```
 
-![3.4.17.png](assets/3.4/17.png)
+![3.4.17.png](assets/3/3.4/17.png)
 
 #### 3.4.9.3 透明度
 
@@ -3564,7 +3564,7 @@ y<sub>new</sub> = bx<sub>prev</sub> + dy<sub>prev</sub> + f
 </svg>
 ```
 
-![3.4.18.png](assets/3.4/18.png)
+![3.4.18.png](assets/3/3.4/18.png)
 
 ### 3.4.10 滤镜效果
 
@@ -4060,7 +4060,7 @@ https://blog.csdn.net/guoqi_666/article/details/137260613
 **注意：`WebSocket`连接在任何时候都可能关闭，例如网络故障、服务器崩溃等情况都可能导致连接关闭。因此，需要及时处理`WebSocket`
 连接关闭的事件，以确保应用程序的可靠性和稳定性。**
 
-![3.6.1.png](assets/3.6/1.png)
+![3.6.1.png](assets/3/3.6/1.png)
 
 ### 3.6.2 数据帧格式
 
@@ -4070,7 +4070,7 @@ https://blog.csdn.net/guoqi_666/article/details/137260613
 
 统一格式详见`data-frame.text`文件
 
-![3.6.2.png](assets/3.6/2.png)
+![3.6.2.png](assets/3/3.6/2.png)
 
 针对前面的格式概览图进行逐个字段解释：
 

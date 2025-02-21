@@ -1,5 +1,5 @@
-import {defineConfig} from 'vite';
-import vue from '@vitejs/plugin-vue';
+import {defineConfig} from "vite";
+import vue from "@vitejs/plugin-vue";
 
 export default defineConfig(() => {
     /**
@@ -8,17 +8,17 @@ export default defineConfig(() => {
      * @returns {string} 分包名
      */
     const manualChunks = (id) => {
-        if (id.includes('node_modules')) {
-            if (id.includes('lodash-es')) {
-                return 'lodash-vendor'; // 将包含 lodash-es 的代码打包到 lodash-vendor chunk
+        if (id.includes("node_modules")) {
+            if (id.includes("lodash-es")) {
+                return "lodash-vendor"; // 将包含 lodash-es 的代码打包到 lodash-vendor chunk
             }
-            if (id.includes('element-plus')) {
-                return 'el-vendor'; // 将包含 element-plus 的代码打包到 el-vendor chunk
+            if (id.includes("element-plus")) {
+                return "el-vendor"; // 将包含 element-plus 的代码打包到 el-vendor chunk
             }
-            if (id.includes('@vue') || id.includes('vue')) {
-                return 'vue-vendor'; // 将包含 @vue 和 vue 的代码打包到 vue-vendor chunk
+            if (id.includes("@vue") || id.includes("vue")) {
+                return "vue-vendor"; // 将包含 @vue 和 vue 的代码打包到 vue-vendor chunk
             }
-            return 'vendor'; // 其余内容打包到 vendor chunk
+            return "vendor"; // 其余内容打包到 vendor chunk
         }
     };
 

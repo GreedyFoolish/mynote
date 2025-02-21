@@ -618,7 +618,7 @@ count.value++ // state.count 值改变为 1
 
 ### 5.5.4 reactive与ref对比图
 
-![5.5.1.png](assets/5.5/1.png)
+![5.5.1.png](assets/5/5.5/1.png)
 
 ## 5.6 useTemplateRef使用
 
