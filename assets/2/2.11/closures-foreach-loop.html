@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<p id="help">Helpful notes will appear here</p>
+<p>Email: <label for="email">Email: </label><input type="text" id="email" name="email"/></p>
+<p>Name: <label for="name">Name: </label><input type="text" id="name" name="name"/></p>
+<p>Age: <label for="age">Age: </label><input type="text" id="age" name="age"/></p>
+
+<script type="text/javascript">
+    function showHelp(help) {
+        document.getElementById("help").textContent = help;
+    }
+
+    function setupHelp() {
+        var helpText = [
+            {id: "email", help: "Your email address"},
+            {id: "name", help: "Your full name"},
+            {id: "age", help: "Your age (you must be over 16)"},
+        ];
+
+        helpText.forEach(function (text) {
+            document.getElementById(text.id).onfocus = function () {
+                showHelp(text.help);
+            };
+        });
+    }
+
+    setupHelp();
+</script>
+</body>
+</html>

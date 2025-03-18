@@ -3593,6 +3593,9 @@ y<sub>new</sub> = bx<sub>prev</sub> + dy<sub>prev</sub> + f
 ## 3.5 Blob及File学习
 
 参考：https://juejin.cn/post/7424414729857400870
+https://juejin.cn/post/7395866692798201871
+https://blog.csdn.net/weixin_41636483/article/details/112589158
+https://www.cnblogs.com/yuzhihui/p/17041062.html
 
 ### 3.5.1 Blob对象
 

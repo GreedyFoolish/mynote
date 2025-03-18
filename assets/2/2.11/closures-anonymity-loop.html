@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<p id="help">Helpful notes will appear here</p>
+<p>Email: <label for="email">Email: </label><input type="text" id="email" name="email"/></p>
+<p>Name: <label for="name">Name: </label><input type="text" id="name" name="name"/></p>
+<p>Age: <label for="age">Age: </label><input type="text" id="age" name="age"/></p>
+
+<script type="text/javascript">
+    function showHelp(help) {
+        document.getElementById("help").textContent = help;
+    }
+
+    function setupHelp() {
+        var helpText = [
+            {id: "email", help: "Your email address"},
+            {id: "name", help: "Your full name"},
+            {id: "age", help: "Your age (you must be over 16)"},
+        ];
+
+        for (var i = 0; i < helpText.length; i++) {
+            (function () {
+                var item = helpText[i];
+                document.getElementById(item.id).onfocus = function () {
+                    showHelp(item.help);
+                };
+            })(); // 立即将事件监听器附着到当前的 item 值（保留到每次迭代）。
+        }
+    }
+
+    setupHelp();
+</script>
+</body>
+</html>

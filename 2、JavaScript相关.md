@@ -7,13 +7,13 @@ const img_url = "13643608813441.jpg"
 const img = new Image()
 img.src = img_url
 if (img.complete) {
-    // 判断是否有缓存
+  // 判断是否有缓存
   alert("from:complete : width:" + img.width + ",height:" + img.height)
 } else {
-    // 加载完成执行
-    img.onload = function () {
-      alert("width:" + img.width + ",height:" + img.height)
-    }
+  // 加载完成执行
+  img.onload = function () {
+    alert("width:" + img.width + ",height:" + img.height)
+  }
 }
 ```
 
@@ -1347,3 +1347,660 @@ export default router;
 
 `navigator.onLine`属性可以用来检测用户是否处于在线状态，而`AbortController`可以用来取消正在进行的`fetch`
 请求。结合这两者，可以实现一个优雅的网络状态切换处理机制。详见`cancel-network-switching.vue`文件。
+
+## 2.10 深拷贝和浅拷贝
+
+参考：https://juejin.cn/post/7390593301508866060
+
+拷贝分为深拷贝`deep copy`和浅拷贝`shallow copy`，这两种都为编程中常见的概念，特别是在处理数据结构和对象时很重要。
+
+首先需要知道，拷贝`copy`这一概念通常只针对引用类型，是指将一个对象的值复制（或引用）到另一个对象中的操作，按修改原对象的值是否会影响到新对象分为浅拷贝和深拷贝。
+
+* 浅拷贝：基于原对象，拷贝得到一个新的对象，原对象中内容的修改会影响新对象。
+* 深拷贝：基于原对象，拷贝得到一个新的对象，原对象中内容的修改不会影响新对象。
+
+![2.10.1.png](assets/2/2.10/1.png)
+![2.10.2.png](assets/2/2.10/2.png)
+
+通俗来讲，浅拷贝只复制对象本身，而不复制对象内部的引用对象，这意味着新对象与原对象共享同一组内部对象。而深拷贝则会递归复制所有引用对象，确保所有对象都是独立的。
+
+无论是实现方法还是应用场景，浅拷贝都占了大多数。这是因为浅拷贝的实现相对简单，对于许多应用场景已经足够。浅拷贝的主要优势在于效率和内存使用上，因为它只复制对象本身，而不会递归复制整个对象图。
+
+### 2.10.1 浅拷贝的实现方法
+
+#### 2.10.1.1 Object.create(obj)
+
+```javascript
+let obj = {
+    a: 1
+}
+let obj2 = Object.create(obj);
+obj.a = 2;
+console.log(obj2.a);
+// 输出为 2
+```
+
+#### 2.10.1.2 Object.assign({}, obj)
+
+`Object.assign({}, obj)`实现拷贝的原理，是将一个或多个原对象的所有可枚举属性复制到目标对象`{}`中，并返回目标对象。
+
+**注意：`Object.assign({}, obj)`可以改变原对象的引用类型而改变新对象，而原始类型的改变不会影响新对象。**
+
+```javascript
+// 原始对象
+const obj = {
+    name: "小明",
+    like: {
+        n: "running"
+    }
+};
+// 浅拷贝得到新对象
+const shallowCopy = Object.assign({}, obj);
+// 修改原对象的值
+obj.name = "小红"; // 原对象的原始类型修改不会改变新对象中的值
+obj.like.n = "swimming" // 原对象的引用类型修改会改变新对象中的值
+console.log("Shallow Copy:", shallowCopy);
+// 输出 Shallow Copy: { name: "小明", like: { n: "swimming" } }
+```
+
+#### 2.10.1.3 [].concat(arr)
+
+`[].concat(arr)`实现拷贝的原理是将`arr`中的元素合并到`[]`中，并返回一个新数组。同样的，改变原对象的引用类型会改变新对象，而原始类型的改变不会影响新对象。
+
+```javascript
+// 原始数组
+const arr = [1, 2, 3, {a: "小明"}];
+// 浅拷贝得到新数组
+const shallowCopy = [].concat(arr);
+// 修改原数组的值
+arr[1] = 20; // 不会改变新对象
+arr[3].a = "小红"; // 会改变新对象
+console.log("Shallow Copy Array:", shallowCopy);
+// 输出 Shallow Copy Array: [ 1, 2, 3, { a: "小红" } ]
+```
+
+#### 2.10.1.4 [...arr]
+
+`[...arr]`实现拷贝的原理是将`arr`中的元素全部解析出来。提取元素，通过数组解构赋值创建一个新数组，复制原数组的元素到新数组中。
+
+```javascript
+// 原始数组
+const arr = [1, 2, 3, {a: "小明"}];
+// 浅拷贝得到数组
+const shallowCopy = [...arr];
+// 修改原数组的值
+arr[1] = 20; // 不会改变新对象
+arr[3].a = "小红"; // 会改变新对象
+console.log("Shallow Copy Array:", shallowCopy);
+// 输出Shallow Copy Array: [ 1, 2, 3, { a: "小红" } ]
+```
+
+#### 2.10.1.5 arr.slice()
+
+`slice()`方法原本是从现有数组中提取出指定范围的元素（左开右闭），然后返回这些元素组成的新数组，而不会修改原始数组。
+
+```javascript
+// 原始数组
+const arr = [1, 2, 3, {a: "小明"}];
+// 浅拷贝得到数组
+const shallowCopy = arr.slice(0);
+// 修改原数组的值
+arr[1] = 20; // 不会改变新对象
+arr[3].a = "小红"; // 会改变新对象
+console.log("Shallow Copy Array:", shallowCopy);
+// 输出Shallow Copy Array: [ 1, 2, 3, { a: "小红" } ]
+```
+
+#### 2.10.1.6 arr.reverse().reverse()
+
+`arr.reverse().reverse()`是对原数组进行了两次反转操作，结果是将数组的顺序恢复到最初的顺序。
+
+```javascript
+const arr = [1, 2, 3, 4];
+arr.reverse(); // 第一次反转，原数组变为 [4, 3, 2, 1]
+arr.reverse(); // 第二次反转，原数组再次变为 [1, 2, 3, 4]
+```
+
+#### 2.10.1.7 手写实现浅拷贝
+
+```javascript
+function shallow(obj) {
+    let newObj = {}
+    for (let key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            newObj[key] = obj[key]
+        }
+    }
+    return newObj
+}
+
+let obj = {
+    name: "小明",
+    like: {
+        a: "food"
+    }
+}
+// 浅拷贝
+let obj2 = shallow(obj)
+console.log(obj2);  //输出{ name: "小明", like: { a: "food" } }
+obj.like.a = "beer" //修改原对象的值
+console.log(obj2);  //输出{ name: "小明", like: { a: "beer" } }
+```
+
+### 2.10.2 深拷贝的实现方法
+
+#### 2.10.2.1 JSON.parse(JSON.stringify(obj))
+
+`JSON.parse(JSON.stringify(obj))`会产生一个与原对象具有相同数据的新对象实例，且两者之间没有引用关系。
+
+但这种方法还是存在以下缺陷：
+
+* 不能识别`BigInt`类型。
+* 不能拷贝`undefined`、`Symbol`、`function`。
+* 不能处理循环引用。
+
+```javascript
+let obj = {
+    name: "小明",
+    age: 18,
+    like: {
+        n: "running"
+    },
+    a: true,
+    b: undefined,
+    c: null,
+    d: Symbol(1),
+    f: function () {
+    }
+}
+// 深拷贝
+let obj2 = JSON.parse(JSON.stringify(obj));
+obj.like.n = "swimming";
+// 打印结果
+console.log(obj);   // 输出 { name: "小明", age: 18, like: { n: "swimming" }, a: true, b: undefined, c: null, d: Symbol(1), f: [Function (anonymous)] }
+console.log(obj2);  // 输出 { name: "小明", age: 18, like: { n: "running" }, a: true, c: null }
+```
+
+可以看到这种方法无法能识别`undefined`、`Symbol`、`function`三种类型。而且如果我们添加上`e:123n`这个大整形的话则会报错。
+
+#### 2.10.2.2 structuredClon()
+
+```javascript
+// 原始对象
+let obj = {
+    name: "小明",
+    like: {
+        n: "running"
+    }
+}
+// 深拷贝得到对象
+const shallowCopy = structuredClone(obj);
+// 修改原对象的值
+obj.name = "小红";
+obj.like.n = "swimming"
+// 输出结果
+console.log("Shallow Copy:", shallowCopy);
+//输出Shallow Copy: { name: "小明", like: { n: "running" } }
+```
+
+#### 2.10.2.3 手写实现深拷贝
+
+```javascript
+function deepCopy(obj) {
+    let newObj = {}
+    for (let key in obj) {
+        // 规避隐式原型属性
+        if (obj.hasOwnProperty(key)) {
+            // 判断是不是对象
+            if (obj[key] instanceof Object) {
+                // typeof obj[key] === "object" && obj[key] !== bull
+                newObj[key] = deepCopy(obj[key])
+            } else {
+                newObj[key] = obj[key]
+            }
+        }
+    }
+    return newObj
+}
+
+let obj = {
+    name: "小明",
+    like: {
+        a: "food"
+    }
+}
+// 深拷贝
+const obj2 = deepCopy(obj)
+
+console.log(obj2);  //输出 { name: "小明", like: { a: "food" } }
+// 修改原对象的值
+obj.name = "小红"
+obj.like.a = "beer"
+console.log(obj2);  //输出 { name: "小明", like: { a: "food" } }
+```
+
+## 2.11 闭包
+
+参考：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Closures
+https://juejin.cn/post/7397628739885957155
+https://juejin.cn/post/7263628964748197948
+https://juejin.cn/post/6911473286627098638
+
+闭包是由捆绑起来（封闭的）的函数和函数周围状态（词法环境）的引用组合而成。换言之，闭包让函数能访问它的外部作用域。
+
+在`JavaScript`中，闭包会随着函数的创建而同时创建。
+
+### 2.11.1 词法作用域
+
+```javascript
+function init() {
+    var name = "Mozilla"; // name 是 init 创建的局部变量
+    function displayName() {
+        // displayName() 是内部函数，它创建了一个闭包
+        console.log(name); // 使用在父函数中声明的变量
+    }
+
+    displayName();
+}
+
+init();
+// 输出 Mozilla
+```
+
+`init()`创建了一个名为`name`的局部变量和一个名为`displayName()`的函数。`displayName()`是在`init()`内定义的内部函数，并且仅在
+`init()`函数的函数体内可用。`displayName()`没有自己的局部变量。因为内部函数能访问外部作用域的变量，所以其能访问`init()`
+函数中声明的`name`变量。
+
+### 2.11.2 let和const的作用域
+
+在`ES6`发布之前，`JavaScript`变量仅有两种类型的作用域：函数作用域和全局作用域。用`var`声明的变量要么属于函数作用域要么属于全局作用域，
+这取决于变量是在函数内声明的还是在函数外声明的。花括号块不为`var`创建作用域让人有点难以捉摸。
+
+```javascript
+if (Math.random() > 0.5) {
+    var x = 1;
+} else {
+    var x = 2;
+}
+console.log(x);
+```
+
+对学习过块创建作用域的语言（如：`C`、`Java`）的开发者而言，上面的代码的`console.log`应该抛出一个错误，因为其在`x`
+作用域外。然而，因为块不会为`var`创建作用域，所以这里的`var`语句实际上创建的是全局变量。
+
+在`ES6`中，`JavaScript`引入了`let`和`const`声明，这些声明围绕在诸如暂时性死区的其他东西之中，会创建块级作用域的变量。
+
+```javascript
+if (Math.random() > 0.5) {
+    const x = 1;
+} else {
+    const x = 2;
+}
+console.log(x); // ReferenceError: x is not defined
+```
+
+从本质上说，在`ES6`中仅当使用`let`或`const`声明变量时，块才会认为是作用域。此外，`ES6`引入了模块，模块引入了另一种作用域。闭包能够捕获所有这些作用域中的变量。
+
+### 2.11.3 闭包
+
+```javascript
+function makeFunc() {
+    const name = "Mozilla";
+
+    function displayName() {
+        console.log(name);
+    }
+
+    return displayName;
+}
+
+const myFunc = makeFunc();
+myFunc();
+```
+
+第一眼看上去，也许不能直观地看出这段代码能够正常运行。在一些编程语言中，函数内的局部变量仅存在于函数的执行期间。一旦`makeFunc()`
+执行完毕，你可能会认为`name`变量将不能再被访问。然而，因为代码仍按预期运行，所以在`JavaScript`中情况显然与此不同。
+
+原因在于，`JavaScript`中的函数创建了闭包。闭包是由函数以及函数声明所在的词法环境组合而成的。该环境包含了这个闭包创建时作用域内的任何局部变量。
+
+`myFunc`是执行`makeFunc`时创建的`displayName`函数的实例引用。`displayName`的实例有一个它的词法环境的引用，而`name`
+变量位于这个词法环境中。因此，当`myFunc`被调用时，`name`变量仍然可用，其值`Mozilla`就被传递到`console.log`中。
+
+下面是一个稍微更有意思的`makeAdder`函数示例：
+
+```javascript
+function makeAdder(x) {
+    return function (y) {
+        return x + y;
+    };
+}
+
+const add5 = makeAdder(5);
+const add10 = makeAdder(10);
+
+console.log(add5(2)); // 7
+console.log(add10(2)); // 12
+```
+
+在这个示例中，我们定义了`makeAdder(x)`函数，它接受一个`x`参数，并返回一个新函数。返回的函数接受一个`y`参数，并返回`x`和`y`的和。
+
+从本质上讲，`makeAdder`是一个函数工厂。它创建了将指定的值和它的参数相加求和的函数。在上面的示例中，函数工厂创建了两个新函数，一个将其参数和
+`5`求和，另一个将其参数和`10`求和。
+
+`add5`和`add10`都创建了闭包。它们共享相同的函数体定义，但是保存了不同的词法环境。在`add5`的词法环境中，`x`为`5`，而在`add10`
+的词法环境中，`x`则为`10`。
+
+### 2.11.4 闭包的作用
+
+闭包很有用，因为它能将数据（词法环境）与运算数据的函数关联起来。这显然类似于面向对象编程。在面向对象编程中，对象能将数据（对象的属性）与一个或者多个方法关联起来。
+
+因此，在你通常使用只有一个方法的对象的地方，都可以使用闭包。
+
+在`Web`中，你想要这样做的情况特别常见。在前端`JavaScript`中书写的大部分代码都是基于事件的。你定义某种行为，然后将其添加到由用户
+触发的事件上（比如点击或者按键）。代码添加为回调（在事件响应中执行的一个函数）。
+
+例如，假设我们想在页面上添加一些可以调整字号的按钮。一种方法是指定`body`元素的`font-size`（像素单位），然后使用相对的`em`
+单位设置页面上其他元素（例如`header`）的字号：
+
+```css
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 12px;
+}
+
+h1 {
+    font-size: 1.5em;
+}
+
+h2 {
+    font-size: 1.2em;
+}
+```
+
+这个字号调整按钮能修改`body`元素的`font-size`属性，并且因为使用的是相对单位，页面上的其他元素也会相应地调整。
+
+```javascript
+function makeSizer(size) {
+    return function () {
+        document.body.style.fontSize = `${size}px`;
+    };
+}
+
+const size12 = makeSizer(12);
+const size14 = makeSizer(14);
+const size16 = makeSizer(16);
+// size12、size14 和 size16 三个函数将分别把 body 的字号调整为 12、14、16 像素。你可以将它们添加到按钮上。
+document.getElementById("size-12").onclick = size12;
+document.getElementById("size-14").onclick = size14;
+document.getElementById("size-16").onclick = size16;
+```
+
+### 2.11.5 用闭包模拟私有方法
+
+像`Java`这类的编程语言支持将方法声明为私有的，即它们只能被同一个类中的其他方法调用。
+
+在`JavaScript`没有定义类之前，是没有声明私有方法的原生方式。但使用闭包模拟私有方法是可能的。私有方法不仅有利于限制代码访问，还为管理全局命名空间提供强大能力。
+
+下面的代码展示了如何使用闭包定义能访问私有函数和私有变量的公共函数。
+
+```javascript
+const counter = (function () {
+    let privateCounter = 0;
+
+    function changeBy(val) {
+        privateCounter += val;
+    }
+
+    return {
+        increment() {
+            changeBy(1);
+        },
+        decrement() {
+            changeBy(-1);
+        },
+        value() {
+            return privateCounter;
+        },
+    };
+})();
+
+console.log(counter.value()); // 0
+
+counter.increment();
+counter.increment();
+console.log(counter.value()); // 2
+
+counter.decrement();
+console.log(counter.value()); // 1
+```
+
+本例创建了一个同时被`Counter.increment`、`Counter.decrement`和`Counter.value`三个函数共享的词法环境。
+
+该共享的词法环境在立即执行（也称作`IIFE`）的匿名函数体中创建。这个词法环境包含两个私有项：一个名为`privateCounter`的变量和一个名为
+`changeBy`的函数。你不能从这个匿名函数外部访问私有成员。相反，你间接地通过匿名函数返回的三个公共函数进行访问。
+
+这三个公共函数创建了共享相同词法环境的闭包。得益于词法作用域，它们都可以访问`privateCounter`变量和`changeBy`函数。
+
+```javascript
+const makeCounter = function () {
+    let privateCounter = 0;
+
+    function changeBy(val) {
+        privateCounter += val;
+    }
+
+    return {
+        increment() {
+            changeBy(1);
+        },
+
+        decrement() {
+            changeBy(-1);
+        },
+
+        value() {
+            return privateCounter;
+        },
+    };
+};
+
+const counter1 = makeCounter();
+const counter2 = makeCounter();
+
+console.log(counter1.value()); // 0.
+
+counter1.increment();
+counter1.increment();
+console.log(counter1.value()); // 2.
+
+counter1.decrement();
+console.log(counter1.value()); // 1.
+console.log(counter2.value()); // 0.
+```
+
+每次调用`counter`的匿名函数时，都会创建一个新的词法环境，其中包含一个新的`privateCounter`变量。
+
+每个闭包通过它自己的闭包引用不同版本的`privateCounter`变量。每次调用其中一个`counter`
+时，改变这个变量的值会改变它的词法环境。对一个闭包中的变量进行修改，不会影响到另外一个闭包中的变量值。
+
+### 2.11.6 闭包的作用域链
+
+嵌套函数能访问的外部函数作用域包括外部函数包围的作用域——高效地创建一条函数作用域链。
+
+````javascript
+// 全局作用域
+const e = 10;
+
+function sum(a) {
+    return function (b) {
+        return function (c) {
+            // 外部函数作用域
+            return function (d) {
+                // 局部作用域
+                return a + b + c + d + e;
+            };
+        };
+    };
+}
+
+console.log(sum(1)(2)(3)(4)); // 20
+````
+
+### 2.11.7 在循环中创建闭包
+
+在循环中创建闭包，可以创建一个函数数组，每个函数都包含一个不同的词法环境。
+
+示例代码详见`closures-loop.html`文件。
+
+`helpText`数组中定义了三个有用的提示信息，每个都与文档中`input`字段的`ID`关联。循环遍历这些定义，将`onfocus`
+事件与显示帮助信息的方法进行关联。
+
+如果你试着运行这段代码，你会发现它没有达到预期的效果。无论你聚焦在那个字段上，显示的都是关于年龄的信息。
+
+原因是赋值给`onfocus`的函数创建了闭包。这些闭包是由函数定义和从`setupHelp`
+函数作用域中捕获的环境所组成的。这三个闭包在循环中创建，但每个都共享同一个词法环境，这个环境有一个不断改变值的变量`item`
+。这是因为`item`变量用`var`声明，并由于声明提升，因此拥有函数作用域。而`item.help`的值是在`onfocus`
+回调执行时决定。因为循环在事件触发之前早已执行完毕，所以`item`变量对象（由三个闭包共享）已经指向了`helpText`的最后一项。
+
+这个例子的一个解决方案就是使用更多的闭包：特别是使用前面所述的函数工厂：
+
+详见`closures-factory-loop.html`文件。
+
+此时回调不再都共享同一个词法环境，`makeHelpCallback`函数为每一个回调创建了一个新的词法环境，在每个新的词法环境中，`help`
+指向`helpText`数组中对应的字符串。
+
+另一种方法是使用匿名闭包：
+
+详见`closures-anonymity-loop.html`文件。
+
+如果你不想使用过多的闭包，你可以使用`let`或`const`关键词：
+
+详见`closures-let-loop.html`文件。
+
+这个示例使用了`const`关键字声明，因此每个闭包绑定的是块作用域变量，这意味着不再需要额外的闭包。
+
+另一个可选方案是使用`forEach()`遍历`helpText`数组并给每一个`input`添加一个监听器：
+
+详见`closures-foreach-loop.html`文件。
+
+### 2.11.8 闭包的性能
+
+每个函数实例管理着它自己的作用域和闭包。因此，如果特定的任务不需要使用闭包，在其他函数内不必要地创建函数是不明智的，因为在处理速度和内存消耗两方面将对脚本性能产生负面影响。
+
+例如，在创建一个新对象或类时，方法通常应该关联到对象的原型上，而不是定义到对象的构造函数中。理由是每次调用构造函数时，方法都会重新赋值（也就是每次创建对象时）。
+
+```javascript
+function MyObject(name, message) {
+    this.name = name.toString();
+    this.message = message.toString();
+    this.getName = function () {
+        return this.name;
+    };
+
+    this.getMessage = function () {
+        return this.message;
+    };
+}
+```
+
+上述代码中并没有利用闭包在特殊实例中使用的好处，我们应该重写避免使用闭包，修改如下：
+
+```javascript
+function MyObject(name, message) {
+    this.name = name.toString();
+    this.message = message.toString();
+}
+
+MyObject.prototype = {
+    getName() {
+        return this.name;
+    },
+    getMessage() {
+        return this.message;
+    },
+};
+```
+
+然而，重新定义原型也不推荐。下面的示例是追加到已存在的原型上：
+
+```javascript
+function MyObject(name, message) {
+    this.name = name.toString();
+    this.message = message.toString();
+}
+
+MyObject.prototype.getName = function () {
+    return this.name;
+};
+MyObject.prototype.getMessage = function () {
+    return this.message;
+};
+```
+
+### 2.11.9 闭包导致的内存泄漏
+
+**变量的生存周期**
+
+* 对于全局变量来说生存周期是永久的，除非主动销毁。
+* 一般对于函数作用域或者局部作用域（`let`、`const`），会随着函数调用的结束而被销毁。
+* 当函数内部调用外部变量就产生了闭包，这时候变量的回收策略可以参考引用计数等垃圾回收策略。
+
+闭包会引用外部函数的词法环境。如果外部函数的词法环境包含对外部函数的引用，则外部函数的词法环境将一直存在，直到外部函数被垃圾回收。
+
+使用`let`定义的`DOM`元素本身不会直接导致内存泄漏，但如果你在闭包或其他地方保留了对这些`DOM`
+元素的引用，并且这些引用没有被正确清理，就可能导致内存泄漏。内存泄漏的问题主要与引用链和垃圾回收机制有关。
+
+关于垃圾回收机制，可以参考[垃圾回收机制](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Memory_Management#垃圾回收机制)。
+
+整理了部分垃圾回收策略，详见`GC.md`文件。
+
+闭包导致的内存泄漏是一个常见的`JavaScript`问题，特别是在使用`Vue`等框架时。以下是闭包导致内存泄漏的一些原因和解决方法：
+
+* **未释放的DOM引用**：
+    * **原因**：当闭包捕获了`DOM`元素的引用，并且这些引用没有被正确释放时，即使`DOM`元素从文档中移除，它们仍然会被闭包引用，导致内存泄漏。
+    * **解决方法**：确保在组件销毁时，清除对`DOM`元素的所有引用。例如，在`Vue`组件的`beforeDestroy`或`unmounted`
+      生命周期钩子中清除事件监听器或定时器。
+
+* **未清除的事件监听器**：
+    * **原因**：如果在闭包中添加了事件监听器，但没有在组件销毁时移除这些监听器，会导致闭包一直持有对`DOM`元素的引用。
+    * **解决方法**：在`Vue`组件的`beforeDestroy`或`unmounted`生命周期钩子中移除所有事件监听器。
+
+* **全局变量或静态属性**：
+    * **原因**：如果闭包中的变量被赋值给全局变量或静态属性，这些变量将不会被垃圾回收。
+    * **解决方法**：尽量避免将闭包中的变量赋值给全局变量或静态属性，或者在不再需要时手动清除这些引用。
+
+* **循环引用**：
+    * **原因**：`JavaScript`的垃圾回收机制基于标记-清除算法，如果存在循环引用，可能会导致内存泄漏。
+    * **解决方法**：避免在闭包中创建循环引用。例如，不要在对象中直接引用闭包，或者使用弱引用（如`WeakMap`）来管理引用。
+
+* **未清除的定时器**：
+    * **原因**：如果在闭包中设置了定时器（如`setInterval`或`setTimeout`），但没有在组件销毁时清除这些定时器，会导致闭包一直存在。
+    * **解决方法**：在`Vue`组件的`beforeDestroy`或`unmounted`生命周期钩子中清除所有定时器。
+
+通过遵循这些最佳实践，可以有效避免闭包导致的内存泄漏问题。
+
+下面是一个未释放的`DOM`引用导致的示例：
+
+`IE`的`JavaScript`对象和`DOM`对象使用不同的垃圾收集方法，因此闭包在`IE`中会导致内存泄露问题，即无法销毁在内存中的`DOM`元素。
+
+因此我们在不需要使用`DOM`时，应将`DOM`解除引用来避免内存泄露。
+
+```javascript
+function closure() {
+    // div 用完之后一直存在内存中，无法被回收
+    var div = document.getElementById('div');
+    div.onclick = function () {
+        console.log(div.innerHTML);// 使用 div 导致内存泄露
+    };
+}
+
+// 解除引用避免内存泄露
+function closure() {
+    var div = document.getElementById('div');
+    var test = div.innerHTML;
+    div.onclick = function () {
+        console.log(test);
+    };
+    div = null;
+}
+```
