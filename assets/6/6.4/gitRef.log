@@ -1,0 +1,26 @@
+PS D:\workspce\my\nodeDemo> git reflog
+b007905 (HEAD -> testBranch, origin/testBranch) HEAD@{0}: checkout: moving from testBranch to testBranch
+b007905 (HEAD -> testBranch, origin/testBranch) HEAD@{1}: branch: Reset to origin/testBranch
+87a9551 HEAD@{2}: rebase (finish): returning to refs/heads/testBranch
+87a9551 HEAD@{3}: rebase (start): checkout 87a9551db6fe181e77a4934014e2e6b8d1be31a2
+bd80693 HEAD@{4}: checkout: moving from main to testBranch
+5fa5d71 (origin/main, origin/HEAD, main) HEAD@{5}: checkout: moving from testBranch to main
+bd80693 HEAD@{6}: commit: feat: 尝试复现代码丢失情况
+87a9551 HEAD@{7}: merge origin/testBranch: Fast-forward
+d947b28 HEAD@{8}: merge origin/testBranch: Fast-forward
+fedd373 HEAD@{9}: reset: moving to fedd373d575d3e55e14cdc379c4f6d9541f64106
+95999b2 HEAD@{10}: checkout: moving from main to testBranch
+5fa5d71 (origin/main, origin/HEAD, main) HEAD@{11}: checkout: moving from testBranch to main
+95999b2 HEAD@{12}: checkout: moving from main to testBranch
+5fa5d71 (origin/main, origin/HEAD, main) HEAD@{13}: checkout: moving from testBranch to main
+95999b2 HEAD@{14}: commit: feat: 尝试复现代码丢失情况
+fedd373 HEAD@{15}: checkout: moving from testBranch to testBranch
+fedd373 HEAD@{16}: branch: Reset to origin/testBranch
+6fca855 HEAD@{17}: checkout: moving from main to testBranch
+5fa5d71 (origin/main, origin/HEAD, main) HEAD@{18}: checkout: moving from testBranch to main
+6fca855 HEAD@{19}: checkout: moving from main to testBranch
+5fa5d71 (origin/main, origin/HEAD, main) HEAD@{20}: checkout: moving from testBranch to main
+6fca855 HEAD@{21}: commit: feat: 尝试复现代码丢失情况
+fedd373 HEAD@{22}: checkout: moving from main to testBranch
+5fa5d71 (origin/main, origin/HEAD, main) HEAD@{23}: clone: from https://github.com/GreedyFoolish/nodeDemo.git
+PS D:\workspce\my\nodeDemo>
