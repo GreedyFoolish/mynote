@@ -1,0 +1,45 @@
+
+// package.json 文件
+{
+  // 项目的名称
+  "name": "@demo/test",
+  // 是否为私有项目。false 表示该项目是公开的，可以被发布到公共的 npm 仓库。如果设置为 true，则项目不会被发布
+  "private": false,
+  // 项目的版本号
+  "version": "1.0.0",
+  // 指定项目的模块类型。默认为 CommonJS，module 表示项目使用 ES 模块（ESM），而不是 CommonJS 模块。这会影响如何导入和导出模块。
+  "type": "module",
+  // 指定项目的入口文件（CommonJS）。
+  "main": "package/dist/demo.umd.cjs",
+  // 指定项目的入口文件（ES 模块）。
+  "module": "package/build/dist/demo.js",
+  // 指定项目的 TypeScript 类型定义文件。
+  "types": "package/build/types/index.d.ts",
+  // 项目的简短描述。
+  "description": "示例demo",
+  // 项目的作者信息。
+  "author": {
+    "name": "demo",
+    "email": "demo@163.com"
+  },
+  // 指定发布配置。
+  "publishConfig": {
+    // 指定发布的目标 npm 仓库地址
+    "registry": "http://192.168.0.1:8888/repository/npm-hosted/",
+    // 指定发布权限，public 表示公开项目，private 表示私有项目。
+    "access": "public"
+  },
+  // 指定发布时包含的文件。
+  "files": [
+    "package/build/*",
+    "readme.md",
+    "log.md"
+  ],
+  // 定义项目中可以运行的脚本。
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "prepublish sign": "npm run \"build\" & npm publish"
+  }
+  // 以下省略依赖包等配置
+}
